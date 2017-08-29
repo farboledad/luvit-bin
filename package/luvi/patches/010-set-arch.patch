@@ -1,0 +1,27 @@
+Index: luvi-2.7.2/cmake/Modules/LuaJITAddExecutable.cmake
+===================================================================
+--- luvi-2.7.2.orig/cmake/Modules/LuaJITAddExecutable.cmake	2016-10-19 15:28:01.176102950 +0200
++++ luvi-2.7.2/cmake/Modules/LuaJITAddExecutable.cmake	2016-10-19 15:30:33.191482463 +0200
+@@ -8,11 +8,12 @@
+ # The Luvit Authors
+ 
+ MACRO(LUAJIT_add_custom_commands luajit_target)
+-  SET(TARGET_ARCH $ENV{TARGET_ARCH})
++  SET(TARGET_ARCH arm)
+   IF(TARGET_ARCH)
+     SET(LJ_BYTECODE_OPTS ${LJ_BYTECODE_OPTS} -a ${TARGET_ARCH})
+   ENDIF(TARGET_ARCH)
+   SET(LUA_PATH $ENV{LUA_PATH})
++  SET(LUA_COMMAND $ENV{LUA_COMMAND})
+   SET(target_srcs "")
+   FOREACH(file ${ARGN})
+     IF(${file} MATCHES ".*\\.lua$")
+@@ -29,7 +30,7 @@
+       add_custom_command(
+         OUTPUT ${generated_file}
+         MAIN_DEPENDENCY ${source_file}
+-        COMMAND "LUA_PATH=${LUA_PATH}" luajit
++        COMMAND "${LUA_COMMAND}"
+         ARGS -b ${LJ_BYTECODE_OPTS}
+           ${source_file}
+           ${generated_file}

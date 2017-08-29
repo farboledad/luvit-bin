@@ -1,0 +1,13 @@
+package m2mweb
+
+config default 'luvitred'
+        option path '/rom/mnt/cust/www/luvitred'
+
+config default 'luvitredui'
+        option path '/tmp/luvitredui'
+
+config default 'snmp'
+        option path '/rom/mnt/cust/www/snmp'
+
+config default 'ui'
+	option path '/rom/mnt/cust/luvit-red/nodes/ui/www'

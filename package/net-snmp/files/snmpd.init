@@ -1,0 +1,71 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2008 OpenWrt.org
+START=99
+
+DEFAULT=/rom/mnt/cust/etc/default/snmpd
+LIB_D=/var/lib/snmp
+LOG_D=/var/log
+RUN_D=/var/run
+PID_F=$RUN_D/snmpd.pid
+RUN_C=$RUN_D/snmpd.conf
+TRAPS=0
+
+snmpd_trapsink_add() {
+	local server="$1"
+	local ip
+	config_get ip "$server" sink2
+
+	[ -z "$ip" -o ${#ip} -eq 1 ] && return 0
+	TRAPS=1  
+	echo "trap2sink $ip" >> $RUN_C
+}
+
+start() {
+	[ -d $LIB_D ] || mkdir -p $LIB_D
+	[ -d $LOG_D ] || mkdir -p $LOG_D
+	[ -d $RUN_D ] || mkdir -p $RUN_D
+	[ -f $RUN_C ] && rm -f $RUN_C
+	cat <<EOT > $RUN_C
+# address and basic user
+agentaddress udp:161
+createUser __monitor MD5 123hgT456d
+rouser __monitor
+iquerySecName __monitor
+EOT
+	config_load cg_conf_snmpd
+	local res
+	echo "# all set from variables with defaults" >> $RUN_C
+	config_get res system sysContact
+	echo "sysContact $res" >> $RUN_C
+	config_get res system sysLocation
+	echo "sysLocation $res" >> $RUN_C
+	config_get res system sysName
+	echo "sysName $res" >> $RUN_C
+	config_get res system sysDescr
+	echo "sysDescr $res" >> $RUN_C
+	local comm
+	config_get comm public community
+	echo "com2sec ro default $comm" >> $RUN_C
+	echo "group $comm v1 ro" >> $RUN_C
+	echo "group $comm v2c ro" >> $RUN_C
+	echo "group $comm usm ro" >> $RUN_C
+	echo "view all included .1" >> $RUN_C
+	echo "access $comm \"\" any noauth exact all none none" >> $RUN_C
+
+	echo "agentxsocket /var/agentx/master" >> $RUN_C
+	echo "master agentx" >> $RUN_C
+
+	echo "# trap addresses" >> $RUN_C
+	snmpd_trapsink_add trapsink1 "$comm"
+	snmpd_trapsink_add trapsink2 "$comm"
+	snmpd_trapsink_add trapsink3 "$comm"
+	[ $TRAPS -eq 1 ] && echo "linkUpDownNotifications yes" >> $RUN_C
+
+	[ -f $DEFAULT ] && . $DEFAULT
+#	$DEBUG /rom/mnt/cust/usr/sbin/snmpd -f -Dverbose:cloudGatePrivate $OPTIONS
+	$DEBUG /rom/mnt/cust/usr/sbin/snmpd -f $OPTIONS > /dev/null 2>&1 &
+}
+stop() {
+	[ -f $PID_F ] && kill $(cat $PID_F)
+	[ -f $RUN_C ] && rm -f $RUN_C
+}

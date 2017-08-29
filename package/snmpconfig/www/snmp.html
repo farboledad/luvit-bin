@@ -1,0 +1,122 @@
+<script type="text/javascript" src="/snmp/js/snmp.js"></script>
+<div ng-controller="snmpCntrlr" class="well form-horizontal" data-ng-init="loadSettings()">
+<form class="form-horizontal" name="form_snmp" novalidate>
+	<fieldset>
+		<cg-section section-title="{{'section.general' | i18n}}">
+		<legend>{{'section.general' | i18n}}</legend>
+		</cg-section>
+		<div class="control-group">
+			<label class="control-label">{{'interface.enable' | i18n}}</label>
+			<div class="controls">
+				<div yes-no="data.isEnabled"></div>
+			</div>
+		</div>
+		<div ng-show="data.isEnabled">
+
+			<label class="control-label">Community</label>
+			<div class="controls">
+				<input name="community" type="text" class="input-medium" ng-model="data.community" ng-maxlength=32 required>
+				<span class="help-inline" ng-show="form_snmp.community.$error.required">Community cannot be empty</span>
+				<span class="help-inline" ng-show="form_snmp.community.$error.maxlength">Community cannot be more than 32 characters</span>
+			</div>
+			<label class="control-label">Contact</label>
+			<div class="controls">
+				<input name="sysContact" type="text" class="input-medium" ng-model="data.sysContact" ng-maxlength=255 required>
+				<span class="help-inline" ng-show="form_snmp.sysContact.$error.required">Contact cannot be empty</span>
+				<span class="help-inline" ng-show="form_snmp.sysContact.$error.maxlength">Contact cannot be more than 255 characters</span>
+			</div>
+			<label class="control-label">Name</label>
+			<div class="controls">
+				<input name="sysName" type="text" class="input-medium" ng-model="data.sysName" ng-maxlength=255 required>
+				<span class="help-inline" ng-show="form_snmp.sysName.$error.required">Name cannot be empty</span>
+				<span class="help-inline" ng-show="form_snmp.sysName.$error.maxlength">Name cannot be more than 255 characters</span>
+			</div>
+			<label class="control-label">Location</label>
+			<div class="controls">
+				<input name="sysLocation" type="text" class="input-medium" ng-model="data.sysLocation" ng-maxlength=255 required>
+				<span class="help-inline" ng-show="form_snmp.sysLocation.$error.required">Location cannot be empty</span>
+				<span class="help-inline" ng-show="form_snmp.sysLocation.$error.maxlength">Location cannot be more than 255 characters</span>
+			</div>
+			<label class="control-label">Description</label>
+			<div class="controls">
+				<input name="sysDescr" type="text" class="input-medium" ng-model="data.sysDescr" ng-maxlength=255 required>
+				<span class="help-inline" ng-show="form_snmp.sysDescr.$error.required">Description cannot be empty</span>
+				<span class="help-inline" ng-show="form_snmp.sysDescr.$error.maxlength">Description cannot be more than 255 characters</span>
+			</div>
+
+			<fieldset>
+				<legend>Trap server 1</legend>
+				<div class="control-group">
+					<label class="control-label">{{'interface.enable' | i18n}}</label>
+					<div class="controls">
+						<div yes-no="data.trapEnabled1"></div>
+					</div>
+				</div>
+				<div ng-show="data.trapEnabled1">
+					<label class="control-label">Server</label>
+					<div class="controls">
+						<input name="trapServer1" type="text" class="input-medium" ng-model="data.trapServer1" ng-maxlength=255>
+						<span class="help-inline" ng-show="form_snmp.trapServer1.$error.maxlength">Server cannot be more than 255 characters</span>
+					</div>
+					<label class="control-label">Community</label>
+					<div class="controls">
+						<input name="trapCommunity1" type="text" class="input-medium" ng-model="data.trapCommunity1" ng-maxlength=32>
+						<span class="help-inline" ng-show="form_snmp.trapCommunity1.$error.maxlength">Community cannot be more than 32 characters</span>
+					</div>
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>Trap server 2</legend>
+				<div class="control-group">
+					<label class="control-label">{{'interface.enable' | i18n}}</label>
+					<div class="controls">
+						<div yes-no="data.trapEnabled2"></div>
+					</div>
+				</div>
+				<div ng-show="data.trapEnabled2">
+					<label class="control-label">Server</label>
+					<div class="controls">
+						<input name="trapServer2" type="text" class="input-medium" ng-model="data.trapServer2" ng-maxlength=255>
+						<span class="help-inline" ng-show="form_snmp.trapServer2.$error.maxlength">Server cannot be more than 255 characters</span>
+					</div>
+					<label class="control-label">Community</label>
+					<div class="controls">
+						<input name="trapCommunity2" type="text" class="input-medium" ng-model="data.trapCommunity2" ng-maxlength=32>
+						<span class="help-inline" ng-show="form_snmp.trapCommunity2.$error.maxlength">Community cannot be more than 32 characters</span>
+					</div>
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>Trap server 3</legend>
+					<div class="control-group">
+					<label class="control-label">{{'interface.enable' | i18n}}</label>
+					<div class="controls">
+						<div yes-no="data.trapEnabled3"></div>
+					</div>
+				</div>
+				<div ng-show="data.trapEnabled3">
+					<label class="control-label">Server</label>
+					<div class="controls">
+						<input name="trapServer3" type="text" class="input-medium" ng-model="data.trapServer3" ng-maxlength=255>
+						<span class="help-inline" ng-show="form_snmp.trapServer3.$error.maxlength">Server cannot be more than 255 characters</span>
+					</div>
+					<label class="control-label">Community</label>
+					<div class="controls">
+						<input name="trapCommunity3" type="text" class="input-medium" ng-model="data.trapCommunity3" ng-maxlength=32>
+						<span class="help-inline" ng-show="form_snmp.trapCommunity3.$error.maxlength">Community cannot be more than 32 characters</span>
+					</div>
+				</div>
+			</fieldset>
+		</div>
+	<p id="SnmpStatus"></p>
+
+	<div class="form-actions">
+		<button class="btn btn-primary" ng-click="btnSnmpSave()" ng-disabled="isClean()">{{'saveChanges' | i18n}}</button>
+		<button class="btn" ng-click="btnSnmpCancel()">{{'cancel' | i18n}}</button>
+	</div>
+	</fieldset>
+Download Option Cloudgate MIB <a href="/snmp/OPTION-CLOUDGATE-MIB">here</a><br>
+Snmpconfig v2.0
+</form>
+</div>
+

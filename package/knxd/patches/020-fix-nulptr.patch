@@ -1,0 +1,135 @@
+Index: knxd-1.18/src/libserver/layer3.h
+===================================================================
+--- knxd-1.18.orig/src/libserver/layer3.h	2016-06-21 17:18:37.229324933 +0200
++++ knxd-1.18/src/libserver/layer3.h	2016-06-21 17:18:37.221326951 +0200
+@@ -116,10 +116,10 @@
+ 
+   /** check if any interface accepts this address.
+       'l2' says which interface NOT to check. */
+-  bool hasAddress (eibaddr_t addr, Layer2Ptr l2 = nullptr);
++  bool hasAddress (eibaddr_t addr, Layer2Ptr l2);
+   /** check if any interface accepts this group address.
+       'l2' says which interface NOT to check. */
+-  bool hasGroupAddress (eibaddr_t addr, Layer2Ptr l2 = nullptr);
++  bool hasGroupAddress (eibaddr_t addr, Layer2Ptr l2);
+   /** save a pointer to this tracer, for deallocation with the L3 */
+   void registerTracer (Trace *t) { tracers.add (t); }
+   /** remember this server, for deallocation with the L3 */
+Index: knxd-1.18/src/libserver/layer3.cpp
+===================================================================
+--- knxd-1.18.orig/src/libserver/layer3.cpp	2016-06-21 17:18:37.229324933 +0200
++++ knxd-1.18/src/libserver/layer3.cpp	2016-06-21 17:18:37.221326951 +0200
+@@ -223,7 +223,7 @@
+     for (int i = 1; i <= client_addrs_len; i++)
+       {
+         eibaddr_t a = client_addrs_start + (client_addrs_pos + i) % client_addrs_len;
+-        if (! hasAddress (a))
++        if (a != defaultAddr)
+           {
+             TRACEPRINTF (t, 3, this, "Allocate %s", FormatEIBAddr (a)());
+             /* remember for next pass */
+Index: knxd-1.18/src/libserver/connection.cpp
+===================================================================
+--- knxd-1.18.orig/src/libserver/connection.cpp	2016-06-21 17:18:37.229324933 +0200
++++ knxd-1.18/src/libserver/connection.cpp	2016-06-21 17:18:37.221326951 +0200
+@@ -23,7 +23,7 @@
+ {
+   con = cc;
+   TRACEPRINTF (con->t, 7, this, "OpenBroadcast");
+-  c = nullptr;
++  c.reset();
+   if (con->size != 5)
+     {
+       TRACEPRINTF (con->t, 7, this, "OpenBroadcast size bad %d", con->size);
+@@ -43,7 +43,7 @@
+ {
+   con = cc;
+   TRACEPRINTF (con->t, 7, this, "OpenGroup");
+-  c = nullptr;
++  c.reset();
+   if (con->size != 5)
+     {
+       TRACEPRINTF (con->t, 7, this, "OpenGroup size bad %d", con->size);
+@@ -64,7 +64,7 @@
+ {
+   con = cc;
+   TRACEPRINTF (con->t, 7, this, "OpenTPDU");
+-  c = nullptr;
++  c.reset();
+   if (con->size != 5)
+     {
+       TRACEPRINTF (con->t, 7, this, "OpenTPDU size bad %d", con->size);
+@@ -84,7 +84,7 @@
+ {
+   con = cc;
+   TRACEPRINTF (con->t, 7, this, "OpenIndividual");
+-  c = nullptr;
++  c.reset();
+   if (con->size != 5)
+     {
+       TRACEPRINTF (con->t, 7, this, "OpenIndividual size bad %d", con->size);
+@@ -106,7 +106,7 @@
+ {
+   con = cc;
+   TRACEPRINTF (con->t, 7, this, "OpenConnection");
+-  c = nullptr;
++  c.reset();
+   if (con->size != 5)
+     {
+       TRACEPRINTF (con->t, 7, this, "OpenConnection size bad %d", con->size);
+@@ -126,7 +126,7 @@
+ {
+   con = cc;
+   TRACEPRINTF (con->t, 7, this, "OpenGroupSocket");
+-  c = nullptr;
++  c.reset();
+   if (con->size != 5)
+     {
+       TRACEPRINTF (con->t, 7, this, "OpenGroupSocket size bad %d", con->size);
+Index: knxd-1.18/src/libserver/eibnetserver.cpp
+===================================================================
+--- knxd-1.18.orig/src/libserver/eibnetserver.cpp	2016-06-21 17:18:37.229324933 +0200
++++ knxd-1.18/src/libserver/eibnetserver.cpp	2016-06-21 17:18:37.221326951 +0200
+@@ -785,7 +785,7 @@
+ 	handle_packet (p1, this->sock);
+     }
+   for (i = 0; i < state (); i++)
+-    state[i] = nullptr;
++    state[i].reset();
+   pth_event_free (stop, PTH_FREE_THIS);
+ }
+ 
+Index: knxd-1.18/src/libserver/eibusb.cpp
+===================================================================
+--- knxd-1.18.orig/src/libserver/eibusb.cpp	2016-06-21 17:18:37.229324933 +0200
++++ knxd-1.18/src/libserver/eibusb.cpp	2016-06-21 17:18:37.221326951 +0200
+@@ -274,7 +274,7 @@
+ USBLayer2::USBLayer2 (LowLevelDriver * i, Layer3 * l3,
+                       L2options *opt) : Layer2 (l3, opt)
+ {
+-  emi = nullptr;
++  emi.reset();
+   LowLevelDriver *iface = initUSBDriver (i, t);
+   if (!iface)
+     return;
+Index: knxd-1.18/src/server/knxd.cpp
+===================================================================
+--- knxd-1.18.orig/src/server/knxd.cpp	2016-06-21 13:33:20.000000000 +0200
++++ knxd-1.18/src/server/knxd.cpp	2016-06-21 17:19:56.727441114 +0200
+@@ -224,7 +224,6 @@
+       u++;
+     }
+   die ("url not supported");
+-  return 0;
+ }
+ 
+ /** parses an EIB individual address */
+@@ -390,7 +389,7 @@
+       break;
+     case 'i':
+       {
+-        BaseServerPtr s = nullptr;
++        BaseServerPtr s;
+         int port = atoi(OPT_ARG(arg,state,"6720"));
+         if (port > 0)
+           s = BaseServerPtr(new InetServer (arguments->l3(), arguments->tracer(), port));

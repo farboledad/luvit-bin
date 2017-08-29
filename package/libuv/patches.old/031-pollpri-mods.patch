@@ -1,0 +1,12 @@
+Index: libuv-1.9.0/src/unix/linux-syscalls.h
+===================================================================
+--- libuv-1.9.0.orig/src/unix/linux-syscalls.h	2016-04-28 15:44:44.000000000 +0200
++++ libuv-1.9.0/src/unix/linux-syscalls.h	2016-04-28 18:12:13.061984052 +0200
+@@ -73,6 +73,7 @@
+ #define UV__EPOLL_CTL_MOD     3
+ 
+ #define UV__EPOLLIN           1
++#define UV__EPOLLPRI          2
+ #define UV__EPOLLOUT          4
+ #define UV__EPOLLERR          8
+ #define UV__EPOLLHUP          16
