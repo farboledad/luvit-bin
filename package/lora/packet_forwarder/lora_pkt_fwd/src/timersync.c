@@ -97,15 +97,17 @@ void thread_timersync(void) {
         /* Regularly disable GPS mode of concentrator's counter, in order to get
             real timer value for synchronizing with host's unix timer */
         MSG("\nINFO: Disabling GPS mode for concentrator's counter...\n");
-        pthread_mutex_lock(&mx_concent); /* TODO: Is it necessary to protect here? */
+        pthread_mutex_lock(&mx_concent);
         lgw_reg_w(LGW_GPS_EN, 0);
         pthread_mutex_unlock(&mx_concent);
 
-        /* Get current concentrator counter value (1MHz) */
-        lgw_get_trigcnt(&sx1301_timecount);
         /* Get current unix time */
         gettimeofday(&unix_timeval, NULL);
 
+        /* Get current concentrator counter value (1MHz) */
+        pthread_mutex_lock(&mx_concent);
+        lgw_get_trigcnt(&sx1301_timecount);
+        pthread_mutex_unlock(&mx_concent);
         concentrator_timeval.tv_sec = sx1301_timecount / 1000000UL;
         concentrator_timeval.tv_usec = sx1301_timecount - (concentrator_timeval.tv_sec * 1000000UL);
 
