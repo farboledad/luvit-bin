@@ -43,10 +43,7 @@ endef
 define Package/lora/install/bin
 	$(INSTALL_DIR) $(1)/usr/bin/lora
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/packet_forwarder/lora_pkt_fwd/lora_pkt_fwd $(1)/usr/bin/lora
-	$(CP) $(PKG_BUILD_DIR)/packet_forwarder/lora_pkt_fwd/global_conf_EU.json $(1)/usr/bin/lora
-	$(CP) $(PKG_BUILD_DIR)/packet_forwarder/lora_pkt_fwd/global_conf_EU433.json $(1)/usr/bin/lora
-	$(CP) $(PKG_BUILD_DIR)/packet_forwarder/lora_pkt_fwd/global_conf_US.json $(1)/usr/bin/lora
-	$(CP) $(PKG_BUILD_DIR)/packet_forwarder/lora_pkt_fwd/global_conf_MY.json $(1)/usr/bin/lora
+	$(CP) $(PKG_BUILD_DIR)/packet_forwarder/lora_pkt_fwd/global_conf_*.json $(1)/usr/bin/lora
 endef
 
 define Package/lora/install/test
