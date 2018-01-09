@@ -8,11 +8,11 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luvi
 PKG_VERSION:=2.7.6
-PKG_RELEASE:=2
+PKG_RELEASE:=3
 PKG_SOURCE_PROTO:=git
 
 PKG_SOURCE_URL:=git://github.com/luvitred/luvi.git
-PKG_REV:=5ca2defafa3f2c1bc7c1e0a056e974a2b7ce12bb
+PKG_REV:=2c195ec92b86a296b403f228dbecad6c08cf1160
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
@@ -21,11 +21,22 @@ PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_REV)-$(PKG_RELEASE).tar.gz
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_SOURCE_SUBDIR)
 
-TARGET_CFLAGS += -I$(STAGING_DIR)/usr/include -O0
-
-# CMAKE_INSTALL:=1
-
 include $(INCLUDE_DIR)/package.mk
+
+define Package/luvi
+  SUBMENU:=Lua
+  SECTION:=lang
+  CATEGORY:=Languages
+  TITLE:=A project in-between luv and luvit
+  URL:=https://github.com/luvit/luvi
+  DEPENDS:=+libopenssl +luv
+endef
+
+define Package/luvi/config
+	source "$(SOURCE)/Config.in"
+endef
+
+TARGET_CFLAGS += -I$(STAGING_DIR)/usr/include
 
 MAKE_FLAGS+=VERBOSE=1
 
@@ -33,13 +44,9 @@ ifeq ($(CONFIG_CCACHE),)
  ifeq ($(CONFIG_EXTERNAL_TOOLCHAIN),)
   CMAKE_C_COMPILER:=$(TOOLCHAIN_DIR)/bin/$(TARGET_CC)
   CMAKE_C_COMPILER_ARG1:=
-  CMAKE_CXX_COMPILER:=$(TOOLCHAIN_DIR)/bin/$(TARGET_CXX)
-  CMAKE_CXX_COMPILER_ARG1:=
  else
   CMAKE_C_COMPILER:=$(shell which $(TARGET_CC))
   CMAKE_C_COMPILER_ARG1:=
-  CMAKE_CXX_COMPILER:=$(shell which $(TARGET_CXX))
-  CMAKE_CXX_COMPILER_ARG1:=
  endif
 else
   CCACHE:=$(shell which ccache)
@@ -48,21 +55,7 @@ else
   endif
   CMAKE_C_COMPILER:=$(CCACHE)
   CMAKE_C_COMPILER_ARG1:=$(filter-out ccache,$(TARGET_CC))
-  CMAKE_CXX_COMPILER:=$(CCACHE)
-  CMAKE_CXX_COMPILER_ARG1:=$(filter-out ccache,$(TARGET_CXX))
 endif
-
-define Package/luvi
-  SUBMENU:=Lua
-  SECTION:=lang
-  CATEGORY:=Languages
-  DEPENDS:=+libopenssl +luv
-  TITLE:=A project in-between luv and luvit.
-endef
-
-define Package/luvi/config
-	source "$(SOURCE)/Config.in"
-endef
 
 # Do not attempt default downloads. Directly clone from git.
 define Download/Defaults
@@ -112,9 +105,9 @@ endif
 define Build/Configure
 	@echo $(PKG_VERSION) > $(PKG_BUILD_DIR)/VERSION
 	(cd $(PKG_BUILD_DIR); \
-		CFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS)" \
-		CXXFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS)" \
-		LDFLAGS="$(TARGET_LDFLAGS) $(EXTRA_LDFLAGS)" \
+		CFLAGS="$(TARGET_CFLAGS)" \
+		CXXFLAGS="$(TARGET_CFLAGS)" \
+		LDFLAGS="$(TARGET_LDFLAGS)" \
 		LUA_PATH="?;?.lua;$(STAGING_DIR_HOST)/share/luajit/?/?.lua" \
 		LUA_COMMAND="$(STAGING_DIR_HOST)/bin/luajit" \
 		cmake \
@@ -123,21 +116,15 @@ define Build/Configure
 			-DCMAKE_SYSTEM_VERSION=1 \
 			-DCMAKE_SYSTEM_PROCESSOR=$(ARCH) \
 			-DCMAKE_C_FLAGS_RELEASE="-DNDEBUG" \
-			-DCMAKE_CXX_FLAGS_RELEASE="-DNDEBUG -Wl,-E" \
 			-DCMAKE_C_COMPILER="$(CMAKE_C_COMPILER)" \
 			-DCMAKE_C_COMPILER_ARG1="$(CMAKE_C_COMPILER_ARG1)" \
-			-DCMAKE_CXX_COMPILER="$(CMAKE_CXX_COMPILER)" \
-			-DCMAKE_CXX_COMPILER_ARG1="$(CMAKE_CXX_COMPILER_ARG1)" \
 			-DCMAKE_EXE_LINKER_FLAGS:STRING="$(TARGET_LDFLAGS) -Wl,-E" \
-			-DCMAKE_MODULE_LINKER_FLAGS:STRING="$(TARGET_LDFLAGS) -Wl,-E" \
-			-DCMAKE_SHARED_LINKER_FLAGS:STRING="$(TARGET_LDFLAGS) -Wl,-E" \
 			-DCMAKE_FIND_ROOT_PATH=$(STAGING_DIR) \
 			-DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=BOTH \
 			-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
 			-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
 			$(LUVI_OPTS) \
 			-DWithSharedLibluv=ON \
-			-DWITH_AMALG=OFF \
 			-DLUAJIT_INCLUDE_DIR="$(STAGING_DIR)/usr/include/luajit-$(shell luajit -v | grep -oP '(?<=LuaJIT )[0-9]+\.[0-9]+')" \
 		. \
 	)

@@ -2,13 +2,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libuv
-PKG_VERSION:=1.12.0
+PKG_VERSION:=1.15.0
 PKG_RELEASE:=1
-
 PKG_SOURCE_PROTO:=git
 
 PKG_SOURCE_URL:=https://github.com/luvitred/libuv.git
-PKG_REV:=88cbbbbbb603d040ab94d9c505f446542b5edb06
+PKG_REV:=a892d9feb0075255c6734918e080db0fd951add8
 
 PKG_SOURCE_VERSION:=$(PKG_REV)
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
@@ -17,15 +16,11 @@ PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_SOURCE_SUBDIR)
 
 include $(INCLUDE_DIR)/package.mk
 
-# CONFIGURE_ARGS += --enable-static --disable-shared
-TARGET_CFLAGS += -O0 -g -pthread
-TARGET_LDFLAGS += -pthread
-
 define Package/libuv
   SECTION:=libs
   CATEGORY:=Libraries
-  URL:=https://github.com/libuv/libuv
   TITLE:=libuv is a new platform layer for Node
+  URL:=https://github.com/libuv/libuv
 endef
 
 define Package/libuv/description
@@ -36,6 +31,10 @@ endef
 # Do not attempt default downloads. Directly clone from git.
 define Download/Defaults
 endef
+
+# CONFIGURE_ARGS += --enable-static --disable-shared
+TARGET_CFLAGS += -pthread
+TARGET_LDFLAGS += -pthread
 
 define Build/Configure
 	(cd $(PKG_BUILD_DIR); echo "Running autogen.sh ..."; ./autogen.sh );

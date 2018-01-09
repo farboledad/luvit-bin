@@ -1,3 +1,5 @@
+# Makefile for luvit-bin package
+
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luvit-bin
@@ -23,7 +25,7 @@ define Build/InstallDev
 endef
 
 define Package/luvit-bin/install
-	tar -xvzf files/luvit-bin.tar.gz -C $(1) 
+	tar -xvzf files/luvit-bin.tar.gz -C $(1)
 endef
 
 $(eval $(call BuildPackage,luvit-bin))
