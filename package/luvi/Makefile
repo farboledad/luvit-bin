@@ -82,6 +82,12 @@ endef
 
 LUVI_OPTS=
 
+ifeq ($(CONFIG_LUVI_EXCLUDE_PCRE),y)
+  LUVI_OPTS += -DWithPCRE=OFF
+else
+  LUVI_OPTS += -DWithPCRE=ON
+endif
+
 ifeq ($(CONFIG_LUVI_EXCLUDE_LPEG),y)
   LUVI_OPTS += -DWithLPEG=OFF
 else

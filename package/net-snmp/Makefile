@@ -29,12 +29,11 @@ define Package/net-snmp/Default/description
  computer equipment and even devices like UPSs. Net-SNMP is a suite of
  applications used to implement SNMP v1, SNMP v2c and SNMP v3 using both
  IPv4 and IPv6.
+
 endef
 
-
-
 define Package/libnetsnmp
-$(call Package/net-snmp/Default)
+  $(call Package/net-snmp/Default)
   SECTION:=libs
   CATEGORY:=Libraries
   DEPENDS:=+libelf
@@ -42,47 +41,40 @@ $(call Package/net-snmp/Default)
 endef
 
 define Package/libnetsnmp/description
-$(call Package/net-snmp/Default/description)
- .
+ $(call Package/net-snmp/Default/description)
  This package contains shared libraries, needed by other programs.
 endef
 
-
 define Package/snmp-utils
-$(call Package/net-snmp/Default)
+  $(call Package/net-snmp/Default)
   DEPENDS:=+libnetsnmp
   TITLE:=Open source SNMP implementation (utilities)
 endef
 
 define Package/snmp-utils/description
-$(call Package/net-snmp/Default/description)
- .
+ $(call Package/net-snmp/Default/description)
  This package contains SNMP client utilities.
 endef
 
-
 define Package/snmpd
-$(call Package/net-snmp/Default)
+ $(call Package/net-snmp/Default)
   DEPENDS:=+libnetsnmp
   TITLE:=Open source SNMP implementation (daemon)
 endef
 
 define Package/snmpd/description
-$(call Package/net-snmp/Default/description)
- .
+ $(call Package/net-snmp/Default/description)
  This package contains the SNMP agent, dynamically linked.
 endef
 
-
 define Package/snmpd-static
-$(call Package/net-snmp/Default)
+  $(call Package/net-snmp/Default)
   TITLE:=Open source SNMP implementation (daemon)
   DEPENDS:=+libelf
 endef
 
 define Package/snmpd-static/description
-$(call Package/net-snmp/Default/description)
- .
+ $(call Package/net-snmp/Default/description)
  This package contains the SNMP agent, statically linked.
 endef
 
@@ -195,7 +187,6 @@ define Build/Prepare
 	cp -ua src/* $(PKG_BUILD_DIR)/agent/mibgroup
 endef
 
-
 ifdef CONFIG_PACKAGE_snmpd-static
   define Build/Compile/static
 	$(MAKE) -C $(PKG_BUILD_DIR)/agent \
@@ -241,8 +232,6 @@ define Package/snmpd/install
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/sbin/snmpd $(1)/usr/sbin/snmpd
 endef
-
-#	ln -sf /var/run/snmpd.conf $(1)/etc/snmp/
 
 define Package/snmpd-static/install
 	$(INSTALL_DIR) $(1)/etc/snmp

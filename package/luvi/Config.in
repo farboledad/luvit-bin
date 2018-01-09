@@ -2,6 +2,10 @@
 menu "Configuration"
 	depends on PACKAGE_luvi
 
+config LUVI_EXCLUDE_PCRE
+	bool "Exclude PCRE"
+	default y
+
 config LUVI_EXCLUDE_LPEG
 	bool "Exclude LPEG"
 	default n

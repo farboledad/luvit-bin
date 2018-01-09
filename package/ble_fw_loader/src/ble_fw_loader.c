@@ -161,7 +161,7 @@ int setBootLoaderActive (int fd)
 	}
 	else
 	{
-		fprintf(stdout,"rxd msg: %s", rxBuffer);
+		fprintf(stdout,"DFU: serial loader ready \r\n");
 	}
 	free(rxBuffer);
 	return 0;
@@ -273,9 +273,9 @@ int xferImageDFU(int fd, char* imagebin, int size_image)
 }
 
 
-void doDFU(char* startpkt, char* initpkt, char* image, int imglen)
+int doDFU(char* startpkt, char* initpkt, char* image, int imglen)
 {
-	int result;
+	int result=-1;
 	int fd;
 
 	fprintf(stdout, "DFU: open serial port\r\n");
@@ -309,7 +309,7 @@ void doDFU(char* startpkt, char* initpkt, char* image, int imglen)
  	}
 endDFU:
 	close(fd);
- 	return;
+ 	return result;
 }
 
 /* ------ main function ------*/
@@ -320,12 +320,13 @@ char startbin[12];
 char initbin[32];
 char *source = NULL;
 char *imagebin = NULL;
+int result=0;
 
 if (!argv[1] || !argv[2])
 {
 	fprintf(stdout,"missing parameter(s)\r\n");
 	fflush(stdout);
-	return 0;
+	return -1;
 }
 
 memcpy (port, argv[2], sizeof(port));
@@ -344,6 +345,7 @@ if (fp != NULL) {
         if (bufsize < 45)
         {
         	fprintf(stderr, "Error: no valid file\r\n");
+        	result = -1;
         }
         else
         {
@@ -356,6 +358,7 @@ if (fp != NULL) {
         	if ( (ferror( fp ) != 0) || (newLen != bufsize))
         	{
             	fprintf(stderr,"Error: file read\r\n");
+            	result = -1;
         	}
         	else
         	{
@@ -366,7 +369,7 @@ if (fp != NULL) {
         			memcpy(startbin,source,sizeof(startbin));
         			memcpy(initbin,source+12, sizeof(initbin));
         			memcpy(imagebin,source+44,imagesize);
-        			doDFU(startbin,initbin,imagebin, imagesize);
+        			result = doDFU(startbin,initbin,imagebin, imagesize);
         			free(imagebin);
         		}
         	}
@@ -376,5 +379,5 @@ if (fp != NULL) {
     fclose(fp);
 }
 
-return 0;
+return result;
 }
