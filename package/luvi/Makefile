@@ -12,7 +12,7 @@ PKG_RELEASE:=3
 PKG_SOURCE_PROTO:=git
 
 PKG_SOURCE_URL:=git://github.com/luvitred/luvi.git
-PKG_REV:=2c195ec92b86a296b403f228dbecad6c08cf1160
+PKG_REV:=e6eb17a8278104f1452ba10268cb9c3d612fbf8b
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
@@ -29,6 +29,7 @@ define Package/luvi
   CATEGORY:=Languages
   TITLE:=A project in-between luv and luvit
   URL:=https://github.com/luvit/luvi
+  MAINTAINER:=Option <support@option.com>
   DEPENDS:=+libopenssl +luv
 endef
 

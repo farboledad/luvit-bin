@@ -8,12 +8,18 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=leveldb
-PKG_VERSION:=1.19
+PKG_VERSION:=1.20
 PKG_RELEASE:=1
 
-PKG_SOURCE:=v$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=http://github.com/google/leveldb/archive/
-PKG_MD5SUM:=6c201409cce6b711f46d68e0f4b1090a
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_URL:=https://github.com/google/leveldb.git
+PKG_REV:=ea0a7586b8615fd39c6b8f5a8a21a1f242129c2f
+
+PKG_SOURCE_VERSION:=$(PKG_REV)
+PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_REV).tar.gz
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_SOURCE_SUBDIR)
+
 PKG_MIRROR:=0
 
 include $(INCLUDE_DIR)/package.mk
@@ -24,7 +30,7 @@ define Package/leveldb
 	CATEGORY:=Libraries
 	TITLE:=A fast and lightweight key/value database library by Google.
 	URL:=https://github.com/google/leveldb
-	MAINTAINER:=Martin Croome <m.croome@option.com>
+	MAINTAINER:=Option <support@option.com>
 endef
 
 define Package/leveldb/config

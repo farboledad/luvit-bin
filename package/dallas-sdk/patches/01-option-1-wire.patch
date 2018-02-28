@@ -382,7 +382,7 @@ diff -urpN orig_1_wire/lib/general/link/CORTEX/cortexses.c 1-wire/lib/general/li
 +#include "ownet.h"
 +#include <sys/stat.h>
 +#include <fcntl.h>
-+
++#include <unistd.h>
 +// defined in link file
 +extern void usDelay(int);
 +

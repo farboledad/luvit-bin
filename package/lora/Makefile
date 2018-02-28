@@ -9,6 +9,7 @@ define Package/lora
   SECTION:=base
   CATEGORY:=Base system
   TITLE:=Lora Gateway
+  MAINTAINER:=Option <support@option.com>
   DEPENDS:=+argp-standalone
 endef
 

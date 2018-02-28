@@ -22,6 +22,7 @@ define Package/knxd
 	SECTION:=net
 	CATEGORY:=Network
 	TITLE:=Eib KNX deamon
+	MAINTAINER:=Option <support@option.com>
 	DEPENDS:=+pthsem +argp-standalone +libstdcpp
 endef
 
@@ -73,7 +74,7 @@ define Package/knxd/install
 	$(CP) $(PKG_BUILD_DIR)/src/server/.libs/knxd $(1)/usr/bin/
 endef
 
-define Package/knxd-utils/install	
+define Package/knxd-utils/install
 	mkdir -p $(1)/usr/lib
 endef
 

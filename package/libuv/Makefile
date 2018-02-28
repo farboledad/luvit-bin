@@ -2,12 +2,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libuv
-PKG_VERSION:=1.15.0
+PKG_VERSION:=1.19.1
 PKG_RELEASE:=1
 PKG_SOURCE_PROTO:=git
 
 PKG_SOURCE_URL:=https://github.com/luvitred/libuv.git
-PKG_REV:=a892d9feb0075255c6734918e080db0fd951add8
+PKG_REV:=ddf11e4a41c5bc3a70475d18e209f6442203b31b
 
 PKG_SOURCE_VERSION:=$(PKG_REV)
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
@@ -21,6 +21,7 @@ define Package/libuv
   CATEGORY:=Libraries
   TITLE:=libuv is a new platform layer for Node
   URL:=https://github.com/libuv/libuv
+  MAINTAINER:=Option <support@option.com>
 endef
 
 define Package/libuv/description
@@ -51,7 +52,6 @@ endef
 define Build/InstallDev
 	$(INSTALL_DIR) $(STAGING_DIR)/usr/include
 	$(INSTALL_DIR) $(STAGING_DIR)/usr/include/uv
-#	$(CP) -r $(PKG_BUILD_DIR)/include/* $(STAGING_DIR)/usr/include
 	$(CP) $(PKG_BUILD_DIR)/include/uv-linux.h $(STAGING_DIR)/usr/include
 	$(CP) $(PKG_BUILD_DIR)/include/uv-unix.h $(STAGING_DIR)/usr/include
 	$(CP) $(PKG_BUILD_DIR)/include/uv-errno.h $(STAGING_DIR)/usr/include

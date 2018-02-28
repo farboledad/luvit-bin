@@ -12,8 +12,8 @@ PKG_NAME:=LuaJIT
 
 PKG_RELEASE:=1
 #PKG_REV used in pc luvi script
-PKG_REV2_1:=99cdfbf6a1e8856f64908072ef10443a7eab14f2
-PKG_REV2_0:=9f0caad0e43f97a4613850b3874b851cb1bc301d
+PKG_REV2_1:=4660dbfa8a4f9eea5218b739075d04faadfeeef6
+PKG_REV2_0:=430d9f8f7ebb779948dbd43944b876b1a3f58551
 
 ifeq ($(CONFIG_LUAJIT_TWO_ONE),y)
 PKG_MAJOR_VERSION:=2
@@ -62,9 +62,16 @@ define Package/luajit/config
 endef
 
 define Package/luajit
-  SECTION:=libs
-  CATEGORY:=Libraries
-  TITLE:=luajit library
+  SUBMENU:=Lua
+  SECTION:=lang
+  CATEGORY:=Languages
+  TITLE:=LuaJIT
+  URL:=http://www.luajit.org
+  MAINTAINER:=Option <support@option.com>
+endef
+
+define Package/luajit/description
+ LuaJIT is a Just-In-Time (JIT) compiler for the Lua programming language. *** Requires GCC Multilib on host system to build! ***
 endef
 
 # Do not attempt default downloads. Directly clone from git.

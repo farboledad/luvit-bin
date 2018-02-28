@@ -10,10 +10,10 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libtelnet
 PKG_VERSION:=0.21.1
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
-PKG_SOURCE_URL:=https://github.com/sousoux/libtelnet.git
-PKG_REV:=4efa4497cdb400356e80b27da50b0c576d62fdef
+PKG_SOURCE_URL:=https://github.com/luvitred/libtelnet.git
+PKG_REV:=278f59b3c6475187fe531a547424084ea201d55a
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_REV).tar.gz
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
@@ -28,6 +28,11 @@ define Package/libtelnet
   SECTION:=libs
   CATEGORY:=Libraries
   TITLE:=Telnet protocol library
+  MAINTAINER:=Option <support@option.com>
+endef
+
+# Do not attempt default downloads. Directly clone from git.
+define Download/Defaults
 endef
 
 define Build/Prepare

@@ -1,12 +1,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luv
-PKG_VERSION:=1.15.0
+PKG_VERSION:=1.19.1
 PKG_RELEASE:=1
 PKG_SOURCE_PROTO:=git
 
 PKG_SOURCE_URL:=git://github.com/luvitred/luv.git
-PKG_REV:=4f9dc19d7d0031fc2334984e0c92d6fe54755ce6
+PKG_REV:=357f4b0f9069c70f53dc2d685ddaa660c682931f
 
 PKG_SOURCE_VERSION:=$(PKG_REV)
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
@@ -20,6 +20,7 @@ define Package/luv
   CATEGORY:=Libraries
   TITLE:=luv - Bare libuv bindings for lua
   URL:=https://github.com/luvit/luv
+  MAINTAINER:=Option <support@option.com>
   DEPENDS:=+luajit +libuv
 endef
 

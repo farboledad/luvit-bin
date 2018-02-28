@@ -11,12 +11,10 @@ owire_lib: $(LIB_OWCORTEX_FILENAME)
 $(LIB_OWCORTEX_FILENAME): $(OBJS_OWCORTEX_LIBDEVICE)
 	$(CC) -shared -fPIC -o $@ $^
 
-DEBUG=-ggdb
-
 OWIRE_LDFLAGS = $(LDFLAGS)
 
 %.o: %.c
-	$(CC) -Iinclude -I. -Icommon/  $(CFLAGS) $(DEBUG) -Wall -fPIC -shared -c $< -o $@
+	$(CC) -Iinclude -I. -Icommon/  $(CFLAGS) -Wall -fPIC -shared -c $< -o $@
 
 
 include makefile_cortex.mk

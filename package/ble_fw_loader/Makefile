@@ -1,3 +1,5 @@
+# Makefile for ble_fw_loader package
+
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=ble_fw_loader
@@ -10,6 +12,7 @@ define Package/ble_fw_loader
   SECTION:=base
   CATEGORY:=Base system
   TITLE:=BLE firmware loader
+  MAINTAINER:=Option <support@option.com>
   DEPENDS:=+libcg +libjson-c
 endef
 

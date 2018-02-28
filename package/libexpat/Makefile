@@ -28,12 +28,12 @@ define Package/libexpat
   CATEGORY:=Libraries
   TITLE:=An XML parsing library
   URL:=http://expat.sourceforge.net/
+  MAINTAINER:=Option <support@option.com>
 endef
 
 define Package/libexpat/description
  A fast, non-validating, stream-oriented XML parsing library.
 endef
-
 
 TARGET_CFLAGS += $(FPIC)
 
