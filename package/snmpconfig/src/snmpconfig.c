@@ -89,6 +89,12 @@ int main (int argc, char *argv[])
     cg_status_t ret;
     int status = EXIT_FAILURE;
 
+    // close all file descriptor which are inherited from the calling process (extras.lua).
+    // solves the problem with One-wire bus to become unavailable after deploy in LuvitRED.
+    int maxfd=sysconf(_SC_OPEN_MAX);
+    for(int fd=3; fd<maxfd; fd++)
+        close(fd);
+
     signal(SIGUSR1, sig_handler);
 
     if ((ret = cg_init("snmp")) != CG_STATUS_OK) {
@@ -222,7 +228,6 @@ void set_snmp_defaults()
     snmp_sysName = cg_conf_set_default(ctx, SNMP_SEC_SYS, "sysName", SNMP_SYSNAME);
     snmp_sysLocation = cg_conf_set_default(ctx, SNMP_SEC_SYS, "sysLocation", SNMP_SYSLOCATION);
     snmp_sysDescr = cg_conf_set_default(ctx, SNMP_SEC_SYS, "sysDescr", SNMP_SYSDESCR);
-
     snmp_community = cg_conf_set_default(ctx, SNMP_SEC_PUBLIC, "community", SNMP_COMMUNITY);
 
     snmp_trapServer1 = cg_conf_set_default(ctx, SNMP_SEC_SERVER1, "sink2", SNMP_TRAPSERVER);

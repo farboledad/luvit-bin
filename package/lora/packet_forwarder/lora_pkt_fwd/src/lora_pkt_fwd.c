@@ -1034,6 +1034,10 @@ int main(int argc, char *argv[])
     struct sigaction sigact; /* SIGQUIT&SIGINT&SIGTERM signal handling */
     int i; /* loop variable and temporary variable for return value */
 
+    /* close all descriptors other than STDIN, STDOUT, STDERR */
+    for (i = sysconf(_SC_OPEN_MAX); i > 2; i--)
+        close(i);
+
     arguments_t args;
     {
         char global[] = "global_conf.json";

@@ -2,16 +2,16 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libuv
-PKG_VERSION:=1.19.1
+PKG_VERSION:=1.19.3
 PKG_RELEASE:=1
 PKG_SOURCE_PROTO:=git
 
 PKG_SOURCE_URL:=https://github.com/luvitred/libuv.git
-PKG_REV:=ddf11e4a41c5bc3a70475d18e209f6442203b31b
+PKG_REV:=435128c4863803510e38f302169c47244b345f2f
 
 PKG_SOURCE_VERSION:=$(PKG_REV)
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_REV).tar.gz
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_REV).tar.gz
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_SOURCE_SUBDIR)
 
 include $(INCLUDE_DIR)/package.mk
@@ -46,7 +46,7 @@ define Build/Compile
 	$(MAKE_VARS) \
 	$(MAKE) -C $(PKG_BUILD_DIR)/$(MAKE_PATH) \
 		$(MAKE_FLAGS) \
-		libuv.la test/run-tests;
+		libuv.la
 endef
 
 define Build/InstallDev

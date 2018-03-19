@@ -13,6 +13,7 @@ PKG_RELEASE:=6
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=@SF/$(PKG_NAME)
+PKG_MD5SUM:=d4a3459e1577d0efa8d96ca70a885e53
 PKG_FIXUP = libtool no-autoreconf
 
 include $(INCLUDE_DIR)/package.mk
