@@ -5,7 +5,7 @@
         "radio_0": {
             "enable": true,
             "type": "SX1257",
-            "freq": 922400000,
+            "freq": 919300000,
             "rssi_offset": -164.0,
             "tx_enable": true,
             "tx_notch_freq": 129000, /* [126..250] KHz */
@@ -15,57 +15,57 @@
         "radio_1": {
             "enable": true,
             "type": "SX1257",
-            "freq": 919800000,
+            "freq": 922500000,
             "rssi_offset": -164.0,
             "tx_enable": false
         },
         "chan_multiSF_0": {
             /* Lora MAC channel, 125kHz, all SF, 922.1 MHz */
             "enable": true,
-            "radio": 0,
-            "if": -300000
+            "radio": 1,
+            "if": -400000
         },
         "chan_multiSF_1": {
             /* Lora MAC channel, 125kHz, all SF, 922.3 MHz */
             "enable": true,
-            "radio": 0,
-            "if": -100000
+            "radio": 1,
+            "if": -200000
         },
         "chan_multiSF_2": {
             /* Lora MAC channel, 125kHz, all SF, 922.5 MHz */
             "enable": true,
-            "radio": 0,
-            "if": 100000
+            "radio": 1,
+            "if": 0
         },
         "chan_multiSF_3": {
             /* Lora MAC channel, 125kHz, all SF, 922.7 MHz */
             "enable": true,
-            "radio": 0,
-            "if": 300000
+            "radio": 1,
+            "if": 200000
         },
         "chan_multiSF_4": {
-            /* Lora MAC channel, 125kHz, all SF, 919.5 MHz */
+            /* Lora MAC channel, 125kHz, all SF, 922.9 MHz */
             "enable": true,
             "radio": 1,
-            "if": -300000
+            "if": 400000
         },
         "chan_multiSF_5": {
-            /* Lora MAC channel, 125kHz, all SF, 919.7 MHz */
-            "enable": true,
-            "radio": 1,
-            "if": -10000
-        },
-        "chan_multiSF_6": {
-            /* Lora MAC channel, 125kHz, all SF, 919.9 MHz */
-            "enable": true,
-            "radio": 1,
-            "if": 100000
-        },
-        "chan_multiSF_7": {
-            /* Lora MAC channel, 125kHz, all SF, 920.1 MHz */
+            /* Lora MAC channel, 125kHz, all SF, 919.1 MHz */
             "enable": true,
             "radio": 0,
-            "if": 300000
+            "if": -200000
+        },
+        "chan_multiSF_6": {
+            /* Lora MAC channel, 125kHz, all SF, 919.3 MHz */
+            "enable": true,
+            "radio": 0,
+            "if": 0
+        },
+        "chan_multiSF_7": {
+            /* Lora MAC channel, 125kHz, all SF, 919.5 MHz */
+            "enable": true,
+            "radio": 0,
+            "if": 200000
         },
         "chan_Lora_std": {
             /* Lora MAC channel, 250kHz, SF7, 868.3 MHz */
@@ -210,8 +210,8 @@
         /* forward only valid packets */
         "forward_crc_valid": true,
         "forward_crc_error": false,
-        "forward_crc_disabled": false,
+        "forward_crc_disabled": false
         /* GPS configuration */
-        "gps_tty_path": "/dev/ttyUSB0"
+        // "gps_tty_path": "/dev/ttyUSB0"
     }
 }

@@ -138,20 +138,22 @@ static uint8_t rf_clkout = 0;
 
 static struct lgw_tx_gain_lut_s txgain_lut = {
     .size = 2,
-    .lut[0] = {
-        .dig_gain = 0,
-        .pa_gain = 2,
-        .dac_gain = 3,
-        .mix_gain = 10,
-        .rf_power = 14
-    },
-    .lut[1] = {
-        .dig_gain = 0,
-        .pa_gain = 3,
-        .dac_gain = 3,
-        .mix_gain = 14,
-        .rf_power = 27
-    }};
+    .lut = {
+        {
+            .dig_gain = 0,
+            .pa_gain = 2,
+            .dac_gain = 3,
+            .mix_gain = 10,
+            .rf_power = 14
+        },{
+            .dig_gain = 0,
+            .pa_gain = 3,
+            .dac_gain = 3,
+            .mix_gain = 14,
+            .rf_power = 27
+        }
+    }
+};
 
 /* TX I/Q imbalance coefficients for mixer gain = 8 to 15 */
 static int8_t cal_offset_a_i[8]; /* TX I offset for radio A */
@@ -214,7 +216,7 @@ int load_firmware(uint8_t target, uint8_t *firmware, uint16_t size) {
     lgw_reg_r( LGW_MCU_PROM_DATA, &dummy ); /* bug workaround */
     lgw_reg_rb( LGW_MCU_PROM_DATA, fw_check, size );
     if (memcmp(firmware, fw_check, size) != 0) {
-        printf ("ERROR: Failed to load fw %d\n", (int)target);
+        DEBUG_PRINTF("ERROR: Failed to load fw %d\n", (int)target);
         return -1;
     }
 
@@ -404,7 +406,7 @@ uint16_t lgw_get_tx_start_delay(bool tx_notch_enable, uint8_t bw) {
 
     tx_start_delay = (float)TX_START_DELAY_DEFAULT - bw_delay_us - notch_delay_us;
 
-    printf("INFO: tx_start_delay=%u (%f) - (%u, bw_delay=%f, notch_delay=%f)\n", (uint16_t)tx_start_delay, tx_start_delay, TX_START_DELAY_DEFAULT, bw_delay_us, notch_delay_us);
+    DEBUG_PRINTF("INFO: tx_start_delay=%u (%f) - (%u, bw_delay=%f, notch_delay=%f)\n", (uint16_t)tx_start_delay, tx_start_delay, TX_START_DELAY_DEFAULT, bw_delay_us, notch_delay_us);
 
     return (uint16_t)tx_start_delay; /* keep truncating instead of rounding: better behaviour measured */
 }
@@ -823,7 +825,7 @@ int lgw_start(void) {
     lgw_reg_r(LGW_DBG_AGC_MCU_RAM_DATA, &read_val);
     fw_version = (uint8_t)read_val;
     if (fw_version != FW_VERSION_CAL) {
-        printf("ERROR: Version of calibration firmware not expected, actual:%d expected:%d\n", fw_version, FW_VERSION_CAL);
+        DEBUG_PRINTF("ERROR: Version of calibration firmware not expected, actual:%d expected:%d\n", fw_version, FW_VERSION_CAL);
         return -1;
     }
 
@@ -1091,7 +1093,7 @@ int lgw_start(void) {
 
     /* */
     if (lbt_is_enabled() == true) {
-        printf("INFO: Configuring LBT, this may take few seconds, please wait...\n");
+        DEBUG_PRINTF("INFO: Configuring LBT, this may take few seconds, please wait...\n");
         wait_ms(8400);
     }
 

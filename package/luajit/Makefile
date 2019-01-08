@@ -12,8 +12,8 @@ PKG_NAME:=LuaJIT
 
 PKG_RELEASE:=1
 #PKG_REV used in pc luvi script
-PKG_REV2_1:=fe651bf6e2b4d02b624be3c289378c08bab2fa9b
-PKG_REV2_0:=046129dbdda5261c1b17469a2895a113d14c070a
+PKG_REV2_1:=b708297aba2b07648bddd16867e44efc9d72666b
+PKG_REV2_0:=fb5e522fbc0750c838ef6a926b11c5d870826183
 
 ifeq ($(CONFIG_LUAJIT_TWO_ONE),y)
 PKG_MAJOR_VERSION:=2
@@ -109,17 +109,16 @@ define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/{lib,include}
 	$(INSTALL_DIR) $(1)/usr/lib/pkgconfig
 	$(INSTALL_DIR) $(1)/usr/include/luajit-$(PKG_MAJOR_VERSION).$(PKG_MINOR_VERSION)
-	$(INSTALL_DIR) $(1)/usr/include/luvit
-	$(INSTALL_DIR) $(1)/usr/include/luvit/luajit
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libluajit* $(1)/usr/lib/
 	-(cd $(1)/usr/lib ;ln -s libluajit-5.1.so libluajit.so)
 	$(CP) $(PKG_INSTALL_DIR)/usr/include/luajit-$(PKG_MAJOR_VERSION).$(PKG_MINOR_VERSION)/* $(1)/usr/include/luajit-$(PKG_MAJOR_VERSION).$(PKG_MINOR_VERSION)
-	# clean up old header files that might exist in SDK
-	-$(RM) $(1)/usr/include/lauxlib.h
-	-$(RM) $(1)/usr/include/luaconf.h
-	-$(RM) $(1)/usr/include/lua.hpp
-	-$(RM) $(1)/usr/include/lua.h
-	-$(RM) $(1)/usr/include/luajit.h
+	# clean up (default) header files that might exist in SDK
+	-$(RM) $(STAGING_DIR)/usr/include/lua.h
+	-$(RM) $(STAGING_DIR)/usr/include/lua.hpp
+	-$(RM) $(STAGING_DIR)/usr/include/luaconf.h
+	-$(RM) $(STAGING_DIR)/usr/include/lualib.h
+	-$(RM) $(STAGING_DIR)/usr/include/luajit.h
+	-$(RM) $(STAGING_DIR)/usr/include/lauxlib.h
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/pkgconfig/luajit.pc $(1)/usr/lib/pkgconfig/luajit.pc
 endef
 

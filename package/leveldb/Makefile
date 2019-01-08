@@ -25,12 +25,17 @@ PKG_MIRROR:=0
 include $(INCLUDE_DIR)/package.mk
 
 define Package/leveldb
-	SECTION:=libs
-	CATEGORY:=Libraries
-	CATEGORY:=Libraries
-	TITLE:=A fast and lightweight key/value database library by Google.
-	URL:=https://github.com/google/leveldb
-	MAINTAINER:=Option <support@option.com>
+  SECTION:=libs
+  CATEGORY:=Libraries
+  CATEGORY:=Libraries
+  TITLE:=A fast and lightweight key/value database library by Google.
+  URL:=https://github.com/google/leveldb
+  MAINTAINER:=Option <support@option.com>
+  DEPENDS:=+libpthread +libstdc++
+endef
+
+define Package/leveldb/extra_provides
+	echo libstdc++.so.6
 endef
 
 define Package/leveldb/config

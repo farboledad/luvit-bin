@@ -213,8 +213,8 @@
         /* forward only valid packets */
         "forward_crc_valid": true,
         "forward_crc_error": false,
-        "forward_crc_disabled": false,
+        "forward_crc_disabled": false
         /* GPS configuration */
-        "gps_tty_path": "/dev/ttyUSB0"
+        // "gps_tty_path": "/dev/ttyUSB0"
     }
 }

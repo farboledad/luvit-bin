@@ -16,7 +16,7 @@ PKG_MD5SUM:=aa42b8465d35cf902931daabbe4ef489
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
-TARGET_CFLAGS += -I$(STAGING_DIR)/usr/include -O0
+TARGET_CFLAGS += -I$(STAGING_DIR)/usr/include
 
 CMAKE_INSTALL:=1
 
@@ -29,7 +29,7 @@ include $(INCLUDE_DIR)/cmake.mk
 define Package/qpid-proton
   SECTION:=libs
   CATEGORY:=Libraries
-  DEPENDS:=+libopenssl +libuuid
+  DEPENDS:=+libopenssl
   TITLE:=qpid-proton v0.8 AMQP library
 endef
 

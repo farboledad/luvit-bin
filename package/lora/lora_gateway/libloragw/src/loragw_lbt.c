@@ -326,7 +326,7 @@ int lbt_is_channel_free(struct lgw_pkt_tx_s * pkt_data, uint16_t tx_start_delay,
             delta_time = tx_end_time - lbt_time;
         } else {
             /* It means LBT counter has wrapped */
-            printf("LBT: lbt counter has wrapped\n");
+            DEBUG_PRINTF("LBT: lbt counter has wrapped\n");
             delta_time = (LBT_TIMESTAMP_MASK - lbt_time) + tx_end_time;
         }
 

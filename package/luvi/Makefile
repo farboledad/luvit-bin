@@ -7,12 +7,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luvi
-PKG_VERSION:=2.7.6
-PKG_RELEASE:=4
+PKG_VERSION:=2.8.0
+PKG_RELEASE:=5
 PKG_SOURCE_PROTO:=git
 
 PKG_SOURCE_URL:=git://github.com/luvitred/luvi.git
-PKG_REV:=30174b5b82ed01930d04b6eebec107951ed88007
+PKG_REV:=7a809d90d084f58af971097abaa3bfa3202efe93
+PKG_BRANCH:=v1.23
+PKG_DATE:="2018-10-01"
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
@@ -30,14 +32,14 @@ define Package/luvi
   TITLE:=A project in-between luv and luvit
   URL:=https://github.com/luvit/luvi
   MAINTAINER:=Option <support@option.com>
-  DEPENDS:=+libopenssl +luv
+  DEPENDS:=+libopenssl +libuv +luajit +luv +libpthread +librt
 endef
 
 define Package/luvi/config
 	source "$(SOURCE)/Config.in"
 endef
 
-TARGET_CFLAGS += -I$(STAGING_DIR)/usr/include
+TARGET_CFLAGS += -I$(STAGING_DIR)/usr/include -lm
 
 MAKE_FLAGS+=VERBOSE=1
 
@@ -62,8 +64,9 @@ endif
 define Download/Defaults
 endef
 
-# Redefine DownloadMethod/git. A git clone --recursive is required to fetch
-# the submodules.
+# Redefine DownloadMethod/git. A git clone --recursive is required to fetch the submodules.
+# deps/luv is not required
+
 define DownloadMethod/git
     $(call wrap_mirror, \
         echo "Checking out files from the git repository..."; \
@@ -71,8 +74,9 @@ define DownloadMethod/git
         cd $(TMP_DIR)/dl && \
         rm -rf $(SUBDIR) && \
         [ \! -d $(SUBDIR) ] && \
-        git clone --recursive $(URL) $(SUBDIR) && \
-        (cd $(SUBDIR) && git checkout $(VERSION) && git submodule update --checkout --recursive) && \
+        git clone -b $(PKG_BRANCH) --shallow-since=$(PKG_DATE) $(URL) $(SUBDIR) && \
+        (cd $(SUBDIR) && git checkout $(VERSION) && \
+        git submodule update --init --recursive deps/lpeg deps/lrexlib deps/lua-openssl deps/lua-zlib deps/pcre deps/zlib) && \
         echo "Packing checkout..." && \
         rm -rf $(SUBDIR)/.git && \
         $(call dl_pack,$(TMP_DIR)/dl/$(FILE),$(SUBDIR)) && \

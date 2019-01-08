@@ -2,12 +2,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libuv
-PKG_VERSION:=1.19.3
+PKG_VERSION:=1.23
 PKG_RELEASE:=1
 PKG_SOURCE_PROTO:=git
 
 PKG_SOURCE_URL:=https://github.com/luvitred/libuv.git
-PKG_REV:=435128c4863803510e38f302169c47244b345f2f
+PKG_REV:=24c8ea37ba6fe16572ad5b5f33dded3b82bcaefa
+PKG_BRANCH:=v$(PKG_VERSION)
+PKG_DATE:="2018-06-25"
 
 PKG_SOURCE_VERSION:=$(PKG_REV)
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
@@ -22,6 +24,7 @@ define Package/libuv
   TITLE:=libuv is a new platform layer for Node
   URL:=https://github.com/libuv/libuv
   MAINTAINER:=Option <support@option.com>
+  DEPENDS:=+libpthread +librt
 endef
 
 define Package/libuv/description
@@ -31,6 +34,22 @@ endef
 
 # Do not attempt default downloads. Directly clone from git.
 define Download/Defaults
+endef
+
+define DownloadMethod/git
+    $(call wrap_mirror, \
+        echo "Checking out files from the git repository..."; \
+        mkdir -p $(TMP_DIR)/dl && \
+        cd $(TMP_DIR)/dl && \
+        rm -rf $(SUBDIR) && \
+        [ \! -d $(SUBDIR) ] && \
+        git clone -b $(PKG_BRANCH) --shallow-since=$(PKG_DATE) $(URL) $(SUBDIR) && \
+        echo "Packing checkout..." && \
+        rm -rf $(SUBDIR)/.git && \
+        $(call dl_pack,$(TMP_DIR)/dl/$(FILE),$(SUBDIR)) && \
+        mv $(TMP_DIR)/dl/$(FILE) $(DL_DIR)/ && \
+        rm -rf $(SUBDIR); \
+    )
 endef
 
 # CONFIGURE_ARGS += --enable-static --disable-shared
@@ -52,12 +71,12 @@ endef
 define Build/InstallDev
 	$(INSTALL_DIR) $(STAGING_DIR)/usr/include
 	$(INSTALL_DIR) $(STAGING_DIR)/usr/include/uv
-	$(CP) $(PKG_BUILD_DIR)/include/uv-linux.h $(STAGING_DIR)/usr/include
-	$(CP) $(PKG_BUILD_DIR)/include/uv-unix.h $(STAGING_DIR)/usr/include
-	$(CP) $(PKG_BUILD_DIR)/include/uv-errno.h $(STAGING_DIR)/usr/include
-	$(CP) $(PKG_BUILD_DIR)/include/uv-version.h $(STAGING_DIR)/usr/include
-	$(CP) $(PKG_BUILD_DIR)/include/uv.h $(STAGING_DIR)/usr/include
-	$(CP) $(PKG_BUILD_DIR)/include/uv-threadpool.h $(STAGING_DIR)/usr/include
+	$(CP) $(PKG_BUILD_DIR)/include/uv/linux.h $(STAGING_DIR)/usr/include/uv/
+	$(CP) $(PKG_BUILD_DIR)/include/uv/unix.h $(STAGING_DIR)/usr/include/uv/
+	$(CP) $(PKG_BUILD_DIR)/include/uv/errno.h $(STAGING_DIR)/usr/include/uv/
+	$(CP) $(PKG_BUILD_DIR)/include/uv/version.h $(STAGING_DIR)/usr/include/uv
+	$(CP) $(PKG_BUILD_DIR)/include/uv/threadpool.h $(STAGING_DIR)/usr/include/uv
+	$(CP) $(PKG_BUILD_DIR)/include/uv.h $(STAGING_DIR)/usr/include/
 	$(INSTALL_DIR) $(STAGING_DIR)/usr/lib
 	$(CP) $(PKG_BUILD_DIR)/.libs/libuv.a $(STAGING_DIR)/usr/lib/
 	$(CP) $(PKG_BUILD_DIR)/.libs/libuv.so* $(STAGING_DIR)/usr/lib/

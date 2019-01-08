@@ -441,6 +441,9 @@ enum jit_error_e jit_peek(struct jit_queue_s *queue, struct timeval *time, int *
 }
 
 void jit_print_queue(struct jit_queue_s *queue, bool show_all, int debug_level) {
+#ifdef NDEBUG
+    (void)(queue); (void)(show_all); (void)(debug_level);
+#else
     int i = 0;
     int loop_end;
 
@@ -461,5 +464,6 @@ void jit_print_queue(struct jit_queue_s *queue, bool show_all, int debug_level) 
 
         pthread_mutex_unlock(&mx_jit_queue);
     }
+#endif
 }
 

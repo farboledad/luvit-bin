@@ -1024,7 +1024,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     return 0;
 }
 
-static struct argp argp = {options, parse_opt, 0, doc};
+static struct argp argp = {options, parse_opt, 0, doc, 0, 0, 0};
 
 /* -------------------------------------------------------------------------- */
 /* --- MAIN FUNCTION -------------------------------------------------------- */
@@ -1173,19 +1173,19 @@ int main(int argc, char *argv[])
     /* hide arguments from ps */
     if (argc > 1) {
         char *arg_end;
-        arg_end = argv[argc-1] + strlen(argv[argc-1]);
-        *arg_end = " ";
+        arg_end = (char *) (argv[argc-1] + strlen(argv[argc-1]));
+        *arg_end = ' ';
     }
 
     /* Start GPS a.s.a.p., to allow it to lock */
     if (gps_tty_path[0] != '\0') { /* do not try to open GPS device if no path set */
         i = lgw_gps_enable(gps_tty_path, "ubx7", 0, &gps_tty_fd); /* HAL only supports u-blox 7 for now */
         if (i != LGW_GPS_SUCCESS) {
-            printf("WARNING: [main] impossible to open %s for GPS sync (check permissions)\n", gps_tty_path);
+            MSG("WARNING: [main] impossible to open %s for GPS sync (check permissions)\n", gps_tty_path);
             gps_enabled = false;
             gps_ref_valid = false;
         } else {
-            printf("INFO: [main] TTY port %s open for GPS synchronization\n", gps_tty_path);
+            MSG("INFO: [main] TTY port %s open for GPS synchronization\n", gps_tty_path);
             gps_enabled = true;
             gps_ref_valid = false;
         }
@@ -1324,12 +1324,10 @@ int main(int argc, char *argv[])
     sigaction(SIGTERM, &sigact, NULL); /* default "kill" command */
 
     /* main loop task : statistics collection */
-    unsigned wait_time = 1000 * (stat_interval > 0 ? stat_interval : 10);
-
     if (stat_interval > 0) {
         while (!exit_sig && !quit_sig) {
             /* wait for next reporting interval */
-            wait_ms(wait_time);
+            wait_ms(stat_interval*1000);
             /* get timestamp for statistics */
             t = time(NULL);
             strftime(stat_timestamp, sizeof stat_timestamp, "%F %T %Z", gmtime(&t));
@@ -1425,57 +1423,57 @@ int main(int argc, char *argv[])
             }
 
             /* display a report */
-            printf("\n##### %s #####\n", stat_timestamp);
-            printf("### [UPSTREAM] ###\n");
-            printf("# RF packets received by concentrator: %u\n", cp_nb_rx_rcv);
-            printf("# CRC_OK: %.2f%%, CRC_FAIL: %.2f%%, NO_CRC: %.2f%%\n", 100.0 * rx_ok_ratio, 100.0 * rx_bad_ratio, 100.0 * rx_nocrc_ratio);
-            printf("# RF packets forwarded: %u (%u bytes)\n", cp_up_pkt_fwd, cp_up_payload_byte);
-            printf("# PUSH_DATA datagrams sent: %u (%u bytes)\n", cp_up_dgram_sent, cp_up_network_byte);
-            printf("# PUSH_DATA acknowledged: %.2f%%\n", 100.0 * up_ack_ratio);
-            printf("### [DOWNSTREAM] ###\n");
-            printf("# PULL_DATA sent: %u (%.2f%% acknowledged)\n", cp_dw_pull_sent, 100.0 * dw_ack_ratio);
-            printf("# PULL_RESP(onse) datagrams received: %u (%u bytes)\n", cp_dw_dgram_rcv, cp_dw_network_byte);
-            printf("# RF packets sent to concentrator: %u (%u bytes)\n", (cp_nb_tx_ok+cp_nb_tx_fail), cp_dw_payload_byte);
-            printf("# TX errors: %u\n", cp_nb_tx_fail);
+            MSG("\n##### %s #####\n", stat_timestamp);
+            MSG("### [UPSTREAM] ###\n");
+            MSG("# RF packets received by concentrator: %u\n", cp_nb_rx_rcv);
+            MSG("# CRC_OK: %.2f%%, CRC_FAIL: %.2f%%, NO_CRC: %.2f%%\n", 100.0 * rx_ok_ratio, 100.0 * rx_bad_ratio, 100.0 * rx_nocrc_ratio);
+            MSG("# RF packets forwarded: %u (%u bytes)\n", cp_up_pkt_fwd, cp_up_payload_byte);
+            MSG("# PUSH_DATA datagrams sent: %u (%u bytes)\n", cp_up_dgram_sent, cp_up_network_byte);
+            MSG("# PUSH_DATA acknowledged: %.2f%%\n", 100.0 * up_ack_ratio);
+            MSG("### [DOWNSTREAM] ###\n");
+            MSG("# PULL_DATA sent: %u (%.2f%% acknowledged)\n", cp_dw_pull_sent, 100.0 * dw_ack_ratio);
+            MSG("# PULL_RESP(onse) datagrams received: %u (%u bytes)\n", cp_dw_dgram_rcv, cp_dw_network_byte);
+            MSG("# RF packets sent to concentrator: %u (%u bytes)\n", (cp_nb_tx_ok+cp_nb_tx_fail), cp_dw_payload_byte);
+            MSG("# TX errors: %u\n", cp_nb_tx_fail);
             if (cp_nb_tx_requested != 0 ) {
-                printf("# TX rejected (collision packet): %.2f%% (req:%u, rej:%u)\n", 100.0 * cp_nb_tx_rejected_collision_packet / cp_nb_tx_requested, cp_nb_tx_requested, cp_nb_tx_rejected_collision_packet);
-                printf("# TX rejected (collision beacon): %.2f%% (req:%u, rej:%u)\n", 100.0 * cp_nb_tx_rejected_collision_beacon / cp_nb_tx_requested, cp_nb_tx_requested, cp_nb_tx_rejected_collision_beacon);
-                printf("# TX rejected (too late): %.2f%% (req:%u, rej:%u)\n", 100.0 * cp_nb_tx_rejected_too_late / cp_nb_tx_requested, cp_nb_tx_requested, cp_nb_tx_rejected_too_late);
-                printf("# TX rejected (too early): %.2f%% (req:%u, rej:%u)\n", 100.0 * cp_nb_tx_rejected_too_early / cp_nb_tx_requested, cp_nb_tx_requested, cp_nb_tx_rejected_too_early);
+                MSG("# TX rejected (collision packet): %.2f%% (req:%u, rej:%u)\n", 100.0 * cp_nb_tx_rejected_collision_packet / cp_nb_tx_requested, cp_nb_tx_requested, cp_nb_tx_rejected_collision_packet);
+                MSG("# TX rejected (collision beacon): %.2f%% (req:%u, rej:%u)\n", 100.0 * cp_nb_tx_rejected_collision_beacon / cp_nb_tx_requested, cp_nb_tx_requested, cp_nb_tx_rejected_collision_beacon);
+                MSG("# TX rejected (too late): %.2f%% (req:%u, rej:%u)\n", 100.0 * cp_nb_tx_rejected_too_late / cp_nb_tx_requested, cp_nb_tx_requested, cp_nb_tx_rejected_too_late);
+                MSG("# TX rejected (too early): %.2f%% (req:%u, rej:%u)\n", 100.0 * cp_nb_tx_rejected_too_early / cp_nb_tx_requested, cp_nb_tx_requested, cp_nb_tx_rejected_too_early);
             }
-            printf("# BEACON queued: %u\n", cp_nb_beacon_queued);
-            printf("# BEACON sent so far: %u\n", cp_nb_beacon_sent);
-            printf("# BEACON rejected: %u\n", cp_nb_beacon_rejected);
-            printf("### [JIT] ###\n");
+            MSG("# BEACON queued: %u\n", cp_nb_beacon_queued);
+            MSG("# BEACON sent so far: %u\n", cp_nb_beacon_sent);
+            MSG("# BEACON rejected: %u\n", cp_nb_beacon_rejected);
+            MSG("### [JIT] ###\n");
             /* get timestamp captured on PPM pulse  */
             pthread_mutex_lock(&mx_concent);
             i = lgw_get_trigcnt(&trig_tstamp);
             pthread_mutex_unlock(&mx_concent);
             if (i != LGW_HAL_SUCCESS) {
-                printf("# SX1301 time (PPS): unknown\n");
+                MSG("# SX1301 time (PPS): unknown\n");
             } else {
-                printf("# SX1301 time (PPS): %u\n", trig_tstamp);
+                MSG("# SX1301 time (PPS): %u\n", trig_tstamp);
             }
             jit_print_queue (&jit_queue, false, DEBUG_LOG);
-            printf("### [GPS] ###\n");
+            MSG("### [GPS] ###\n");
             if (gps_enabled == true) {
                 /* no need for mutex, display is not critical */
                 if (gps_ref_valid == true) {
-                    printf("# Valid time reference (age: %li sec)\n", (long)difftime(time(NULL), time_reference_gps.systime));
+                    MSG("# Valid time reference (age: %li sec)\n", (long)difftime(time(NULL), time_reference_gps.systime));
                 } else {
-                    printf("# Invalid time reference (age: %li sec)\n", (long)difftime(time(NULL), time_reference_gps.systime));
+                    MSG("# Invalid time reference (age: %li sec)\n", (long)difftime(time(NULL), time_reference_gps.systime));
                 }
                 if (gps_fake_enable == true) {
-                    printf("# GPS *FAKE* coordinates: latitude %.5f, longitude %.5f, altitude %i m\n", cp_gps_coord.lat, cp_gps_coord.lon, cp_gps_coord.alt);
+                    MSG("# GPS *FAKE* coordinates: latitude %.5f, longitude %.5f, altitude %i m\n", cp_gps_coord.lat, cp_gps_coord.lon, cp_gps_coord.alt);
                 } else if (coord_ok == true) {
-                    printf("# GPS coordinates: latitude %.5f, longitude %.5f, altitude %i m\n", cp_gps_coord.lat, cp_gps_coord.lon, cp_gps_coord.alt);
+                    MSG("# GPS coordinates: latitude %.5f, longitude %.5f, altitude %i m\n", cp_gps_coord.lat, cp_gps_coord.lon, cp_gps_coord.alt);
                 } else {
-                    printf("# no valid GPS coordinates available yet\n");
+                    MSG("# no valid GPS coordinates available yet\n");
                 }
             } else {
-                printf("# GPS sync is disabled\n");
+                MSG("# GPS sync is disabled\n");
             }
-            printf("##### END #####\n");
+            MSG("##### END #####\n");
 
             /* generate a JSON report (will be sent to server by upstream thread) */
             pthread_mutex_lock(&mx_stat_rep);
@@ -1486,10 +1484,6 @@ int main(int argc, char *argv[])
             }
             report_ready = true;
             pthread_mutex_unlock(&mx_stat_rep);
-        }
-    } else {
-        while (!exit_sig && !quit_sig) {
-            wait_ms(wait_time);
         }
     }
 
@@ -1547,7 +1541,7 @@ void thread_up(void) {
     /* data buffers */
     uint8_t buff_up[TX_BUFF_SIZE]; /* buffer to compose the upstream packet */
     int buff_index;
-    uint8_t buff_ack[32]; /* buffer to receive acknowledges */
+    // uint8_t buff_ack[32]; /* buffer to receive acknowledges */
 
     /* protocol variables */
     uint8_t token_h; /* random token for acknowledgement matching */
@@ -1555,7 +1549,7 @@ void thread_up(void) {
 
     /* ping measurement variables */
     struct timespec send_time;
-    struct timespec recv_time;
+    // struct timespec recv_time;
 
     /* GPS synchronization variables */
     struct timespec pkt_utc_time;
@@ -1646,7 +1640,7 @@ void thread_up(void) {
             switch(p->status) {
                 case STAT_CRC_OK:
                     meas_nb_rx_ok += 1;
-                    printf( "\nINFO: Received pkt from mote: %08X (fcnt=%u)\n", mote_addr, mote_fcnt );
+                    MSG("\nINFO: Received pkt from mote: %08X (fcnt=%u)\n", mote_addr, mote_fcnt);
                     if (!fwd_valid_pkt) {
                         pthread_mutex_unlock(&mx_meas_up);
                         continue; /* skip that packet */
@@ -1933,7 +1927,7 @@ void thread_up(void) {
         ++buff_index;
         buff_up[buff_index] = 0; /* add string terminator, for safety */
 
-        printf("\nJSON up: %s\n", (char *)(buff_up + 12)); /* DEBUG: display JSON payload */
+        MSG("\nJSON up: %s\n", (char *)(buff_up + 12)); /* DEBUG: display JSON payload */
 
         /* send datagram to server */
         send(sock_up, (void *)buff_up, buff_index, 0);
@@ -1943,13 +1937,14 @@ void thread_up(void) {
         meas_up_network_byte += buff_index;
 
         /* wait for acknowledge (in 2 times, to catch extra packets) */
+        /*
         for (i=0; i<2; ++i) {
             j = recv(sock_up, (void *)buff_ack, sizeof buff_ack, 0);
             clock_gettime(CLOCK_MONOTONIC, &recv_time);
             if (j == -1) {
-                if (errno == EAGAIN) { /* timeout */
+                if (errno == EAGAIN) { // timeout
                     continue;
-                } else { /* server connection error */
+                } else { //server connection error
                     break;
                 }
             } else if ((j < 4) || (buff_ack[0] != PROTOCOL_VERSION) || (buff_ack[3] != PKT_PUSH_ACK)) {
@@ -1964,6 +1959,7 @@ void thread_up(void) {
                 break;
             }
         }
+        */
         pthread_mutex_unlock(&mx_meas_up);
     }
     MSG("\nINFO: End of upstream thread\n");
@@ -2255,7 +2251,7 @@ void thread_down(void) {
 
                         /* display beacon payload */
                         MSG("INFO: Beacon queued (count_us=%u, freq_hz=%u, size=%u):\n", beacon_pkt.count_us, beacon_pkt.freq_hz, beacon_pkt.size);
-                        printf( "   => " );
+                        MSG("   => ");
                         for (i = 0; i < beacon_pkt.size; ++i) {
                             MSG("%02X ", beacon_pkt.payload[i]);
                         }
@@ -2315,11 +2311,11 @@ void thread_down(void) {
             /* the datagram is a PULL_RESP */
             buff_down[msg_len] = 0; /* add string terminator, just to be safe */
             MSG("INFO: [down] PULL_RESP received  - token[%d:%d] :)\n", buff_down[1], buff_down[2]); /* very verbose */
-            printf("\nJSON down: %s\n", (char *)(buff_down + 4)); /* DEBUG: display JSON payload */
+            MSG("\nJSON down: %s\n", (char *)(buff_down + 4)); /* DEBUG: display JSON payload */
 
             /* initialize TX struct and try to parse JSON */
             memset(&txpkt, 0, sizeof txpkt);
-            root_val = json_parse_string_with_comments((const char *)(buff_down + 4)); /* JSON offset */
+            root_val = json_parse_string((const char *)(buff_down + 4)); /* JSON offset */
             if (root_val == NULL) {
                 MSG("WARNING: [down] invalid JSON, TX aborted\n");
                 continue;
@@ -2622,7 +2618,7 @@ void thread_down(void) {
                 get_concentrator_time(&current_concentrator_time, current_unix_time);
                 jit_result = jit_enqueue(&jit_queue, &current_concentrator_time, &txpkt, downlink_type);
                 if (jit_result != JIT_ERROR_OK) {
-                    printf("ERROR: Packet REJECTED (jit error=%d)\n", jit_result);
+                    MSG("ERROR: Packet REJECTED (jit error=%d)\n", jit_result);
                 }
                 pthread_mutex_lock(&mx_meas_dw);
                 meas_nb_tx_requested += 1;
@@ -2899,7 +2895,7 @@ void thread_valid(void) {
     /* GPS reference validation variables */
     long gps_ref_age = 0;
     bool ref_valid_local = false;
-    double xtal_err_cpy;
+    double xtal_err_cpy = 0;
 
     /* variables for XTAL correction averaging */
     unsigned init_cpt = 0;
@@ -2968,7 +2964,7 @@ void thread_valid(void) {
                 // fprintf(log_file,"%.18lf,\"track\"\n", xtal_correct); // DEBUG
             }
         }
-        // printf("Time ref: %s, XTAL correct: %s (%.15lf)\n", ref_valid_local?"valid":"invalid", xtal_correct_ok?"valid":"invalid", xtal_correct); // DEBUG
+        // MSG("Time ref: %s, XTAL correct: %s (%.15lf)\n", ref_valid_local?"valid":"invalid", xtal_correct_ok?"valid":"invalid", xtal_correct); // DEBUG
     }
     MSG("\nINFO: End of validation thread\n");
 }

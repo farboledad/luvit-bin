@@ -305,6 +305,13 @@ struct lgw_tx_gain_lut_s {
 int lgw_board_setconf(struct lgw_conf_board_s conf);
 
 /**
+@brief Configure the lorawan network type
+@param set to true for public network
+@return LGW_HAL_ERROR id the operation failed, LGW_HAL_SUCCESS else
+*/
+int lgw_board_setpublic(bool lorawan_public);
+
+/**
 @brief Configure the gateway lbt function
 @param conf structure containing the configuration parameters
 @return LGW_HAL_ERROR id the operation failed, LGW_HAL_SUCCESS else

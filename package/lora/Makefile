@@ -10,7 +10,7 @@ define Package/lora
   CATEGORY:=Base system
   TITLE:=Lora Gateway
   MAINTAINER:=Option <support@option.com>
-  DEPENDS:=+argp-standalone
+  DEPENDS:=+argp-standalone +libpthread +librt
 endef
 
 define Package/lora/config

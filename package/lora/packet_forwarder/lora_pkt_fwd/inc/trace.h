@@ -24,13 +24,19 @@ Maintainer: Michael Coracin
 #define DEBUG_BEACON    0
 #define DEBUG_LOG       0
 
+#define NDEBUG
+
+#ifdef NDEBUG
+#define MSG(args...)
+#define MSG_DEBUG(FLAG, fmt, ...)
+#else
 #define MSG(args...) printf(args) /* message that is destined to the user */
 #define MSG_DEBUG(FLAG, fmt, ...)                                                                         \
             do  {                                                                                         \
                 if (FLAG)                                                                                 \
                     fprintf(stdout, "%s:%d:%s(): " fmt, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__); \
             } while (0)
-
+#endif
 
 
 #endif
