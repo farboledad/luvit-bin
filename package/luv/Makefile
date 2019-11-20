@@ -1,12 +1,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luv
-PKG_VERSION:=1.30
+PKG_VERSION:=1.32
 PKG_RELEASE:=1
 PKG_SOURCE_PROTO:=git
 
 PKG_SOURCE_URL:=git://github.com/luvitred/luv.git
-PKG_REV:=906bc4c827cdfaf4093a8ad084d91566886de6cb
+PKG_REV:=02f8b2531d8ed3fbb4f6d8b7b409bcca65f9df2e
 PKG_BRANCH:=v$(PKG_VERSION)
 PKG_DATE:="2019-07-01"
 

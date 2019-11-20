@@ -12,8 +12,8 @@ PKG_RELEASE:=5
 PKG_SOURCE_PROTO:=git
 
 PKG_SOURCE_URL:=git://github.com/luvitred/luvi.git
-PKG_REV:=71d136fb08ae66ee1a67dfdde26390ff3d235aa0
-PKG_BRANCH:=v1.30
+PKG_REV:=67954c511c9f821c98c6a873e87bb06fe322474f
+PKG_BRANCH:=v1.32
 PKG_DATE:="2019-07-01"
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
@@ -22,6 +22,7 @@ PKG_SOURCE_VERSION:=$(PKG_REV)
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_REV).tar.gz
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_SOURCE_SUBDIR)
+PKG_BUILD_DEPENDS:=luajit/host
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -111,6 +112,12 @@ else
   LUVI_OPTS += -DWithZLIB=ON -DWithSharedZLIB=ON
 endif
 
+ifeq ($(CONFIG_LUAJIT_TWO_ONE),y)
+	LUAJIT_INCLUDE_DIR :="$(STAGING_DIR)/usr/include/luajit-2.1"
+else
+	LUAJIT_INCLUDE_DIR :="$(STAGING_DIR)/usr/include/luajit-2.0"
+endif
+
 # Luvi will first check for a VERSION file to set its ${LUVI_VERSION} variable.
 # The "git describe --tags" alternative will not work for CloudGate (no more .git directory).
 define Build/Configure
@@ -119,7 +126,6 @@ define Build/Configure
 		CFLAGS="$(TARGET_CFLAGS)" \
 		CXXFLAGS="$(TARGET_CFLAGS)" \
 		LDFLAGS="$(TARGET_LDFLAGS)" \
-		LUA_PATH="?;?.lua;$(STAGING_DIR_HOST)/share/luajit/?/?.lua" \
 		LUA_COMMAND="$(STAGING_DIR_HOST)/bin/luajit" \
 		cmake \
 			-H. -DCMAKE_BUILD_TYPE=Release \
@@ -136,7 +142,7 @@ define Build/Configure
 			-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
 			$(LUVI_OPTS) \
 			-DWithSharedLibluv=ON \
-			-DLUAJIT_INCLUDE_DIR="$(STAGING_DIR)/usr/include/luajit-$(shell luajit -v | grep -oP '(?<=LuaJIT )[0-9]+\.[0-9]+')" \
+			-DLUAJIT_INCLUDE_DIR="$(LUAJIT_INCLUDE_DIR)" \
 		. \
 	)
 endef

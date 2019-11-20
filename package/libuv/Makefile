@@ -2,12 +2,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libuv
-PKG_VERSION:=1.30
+PKG_VERSION:=1.32
 PKG_RELEASE:=1
 PKG_SOURCE_PROTO:=git
 
 PKG_SOURCE_URL:=https://github.com/luvitred/libuv.git
-PKG_REV:=96988ab77ebb8b7dfdb844b6f6b97f71a14648a7
+PKG_REV:=bf381d3c41cb37bb7c980a16979ea6456cdd1f37
 PKG_BRANCH:=v$(PKG_VERSION)
 PKG_DATE:="2019-07-01"
 

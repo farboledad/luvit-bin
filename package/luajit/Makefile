@@ -129,8 +129,8 @@ define Host/Compile
 	@echo ">>>> Building host version $(PKG_VERSION) lib $(PKG_LIB_VERSION)"
 	$(MAKE) -C $(HOST_BUILD_DIR) \
 		PREFIX="$(STAGING_DIR_HOST)" \
-		INSTALL_LMOD="$(STAGING_DIR_HOST)/share/luajit" \
-		INSTALL_CMOD="$(STAGING_DIR_HOST)/share/luajit" \
+		INSTALL_LMOD="" \
+		INSTALL_CMOD="" \
 		STAGING_DIR_HOST=$(STAGING_DIR_HOST) amalg
 endef
 
@@ -138,8 +138,8 @@ define Host/Install
 	$(INSTALL_DIR) $(STAGING_DIR_HOST)/bin
 	$(MAKE) -C $(HOST_BUILD_DIR) \
 		PREFIX="$(STAGING_DIR_HOST)" \
-		INSTALL_LMOD="$(STAGING_DIR_HOST)/share/luajit" \
-		INSTALL_CMOD="$(STAGING_DIR_HOST)/share/luajit" \
+		INSTALL_LMOD="" \
+		INSTALL_CMOD="" \
 		STAGING_DIR_HOST=$(STAGING_DIR_HOST) install
 	$(RM) $(STAGING_DIR_HOST)/bin/luajit
 	$(CP) $(STAGING_DIR_HOST)/bin/$(PKG_LUAJIT_EXE) $(STAGING_DIR_HOST)/bin/luajit

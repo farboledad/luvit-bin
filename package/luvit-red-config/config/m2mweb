@@ -1,5 +1,8 @@
 package m2mweb
 
+config default 'm2mweb'
+	option session_timeout 1800
+
 config default 'snmp'
 	option path '/rom/mnt/cust/www/snmp'
 

@@ -13,7 +13,7 @@ define Package/ble_fw_loader
   CATEGORY:=Base system
   TITLE:=BLE firmware loader
   MAINTAINER:=Option <support@option.com>
-  DEPENDS:=+libcg +libjson-c
+  DEPENDS:=
 endef
 
 define Build/Prepare
@@ -23,11 +23,6 @@ endef
 
 define Build/Compile
 	$(MAKE) -C $(PKG_BUILD_DIR) CC="$(TARGET_CC)" LD="$(TARGET_LD)" CFLAGS="$(TARGET_CFLAGS) $(TARGET_CPPFLAGS) $(FPIC)" LDFLAGS="$(TARGET_LDFLAGS)"
-endef
-
-define Build/InstallDev
-	$(INSTALL_DIR) $(1)/usr/bin
-	$(CP) $(PKG_BUILD_DIR)/ble_fw_loader $(1)/usr/bin/
 endef
 
 define Package/ble_fw_loader/install
