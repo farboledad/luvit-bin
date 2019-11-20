@@ -4,7 +4,7 @@ config board CG1120
       option slot_id '1'
       option hwv '2.0'
       option sh_count '1'
-      option sh_0 '/sbin/insmod /lib/modules/2.6.35.3/mxs-auart.ko auart_mask=16 uart4_COMM_TYPE=0 uart4_RTSCTS=0'µ
+      option sh_0 '/sbin/insmod /lib/modules/2.6.35.3/mxs-auart.ko auart_mask=16 uart4_COMM_TYPE=0 uart4_RTSCTS=0'
 
 config board CG2116
       option model 'CG2116'
