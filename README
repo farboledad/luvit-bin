@@ -1,10 +1,18 @@
 Instructions for including LuvitRED in your package build
 =========================================================
 
+Supported Platforms:
+
+* Ubuntu 14.04 LTS
+* Ubuntu 16.04 LTS
+* Ubuntu 18.04 LTS (experimental)
+
+
 1) Untar the luvit-bin.tar.gz file to your CloudGate SDK root directory
 
 cd SDK_ROOT
 tar xvzf luvit-bin.tar.gz
+
 
 2) Make sure that you have all the dependencies necessary for the build installed
 
@@ -14,7 +22,7 @@ The following packages are required to compile the LuvitRED binary package on th
   * cmake (must be greater than 2.8.9. Use 'apt-cache policy cmake' to check your version.)
   * gawk
   * flex
-  * git
+  * git (2.x)
   * subversion
   * libncurses5-dev
   * zlib1g-dev
@@ -24,9 +32,12 @@ These can be installed by apt-get install:
 
 sudo apt-get install g++ cmake gawk flex git subversion libncurses5-dev zlib1g-dev luajit
 
+Check the git version (git --version). If is is not 2.x then install git manually from https://git-scm.com
+
 If you want to cross-compile luajit from a 64-bit host, you need to install the multilib development package as well:
 
 sudo apt-get install libc6-dev-i386
+
 
 3) The LuvitRED package needs to be started up and no doubt your package does as well. This requires integrating the
 'isv' script used by luvitRED with your isv scripts. There are several ways to achieve this:
@@ -42,7 +53,7 @@ luvitred.run.sh  - this script actually runs LuvitRED (and the SNMP config UI). 
 isv              - this is the default isv script for LuvitRED. It just runs the other two scripts. To make sure that your
                    custom isv script overwrites this make luvit-bin depend on your package by adding it as a dependency.
 
-				   e.g.
+e.g.
 
                    define Package/mypackage
                      SECTION:= base
@@ -73,3 +84,10 @@ $(eval $(call BuildModule,mypackage,My Package,mypackage))
 
 You can now select the packages you want to build together in the base menu 'Combine CloudGate packages' option in
 make menuconfig.
+
+4) Compile
+
+cd SDK_ROOT
+make -j
+
+On errors run make V=s or make V=99 to see where the compilation failed.
