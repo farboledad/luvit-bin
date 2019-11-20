@@ -8,13 +8,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=expat
-PKG_VERSION:=2.2.5
+PKG_VERSION:=2.2.6
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=@SF/expat
-PKG_MD5SUM:=789e297f547980fc9ecc036f9a070d49
-PKG_HASH:=d9dc32efba7e74f788fcc4f212a43216fc37cf5f23f4c2339664d473353aedf6
+PKG_MD5SUM:=ca047ae951b40020ac831c28859161b2
+PKG_HASH:=17b43c2716d521369f82fc2dc70f359860e90fa440bea65b3b85f0b246ea81f2
 
 PKG_FIXUP:=libtool
 PKG_REMOVE_FILES:=conftools/libtool.m4
@@ -42,6 +42,9 @@ CONFIGURE_ARGS += \
 	--enable-shared \
 	--enable-static
 
+HOST_CONFIGURE_ARGS += \
+	--without-docbook
+
 define Build/Compile
 	+$(MAKE) $(PKG_JOBS) -C $(PKG_BUILD_DIR) DESTDIR="$(PKG_INSTALL_DIR)" install
 endef
@@ -53,6 +56,10 @@ endef
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/include
 	$(CP) $(PKG_INSTALL_DIR)/usr/include/expat{,_external}.h $(1)/usr/include/
+
+	$(INSTALL_DIR) $(1)/usr/lib/pkgconfig
+	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/usr/lib/pkgconfig/expat.pc $(1)/usr/lib/pkgconfig/
+
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libexpat.{a,so*} $(1)/usr/lib/
 endef
