@@ -413,7 +413,6 @@ static int parse_SX1301_configuration(const char * conf_file) {
     MSG("INFO: antenna_gain %d dBi\n", antenna_gain);
 
     /* set configuration for tx gains */
-    memset(&txlut, 0, sizeof txlut); /* initialize configuration structure */
     for (i = 0; i < TX_GAIN_LUT_SIZE_MAX; i++) {
         snprintf(param_name, sizeof param_name, "tx_lut_%i", i); /* compose parameter path inside JSON structure */
         val = json_object_get_value(conf_obj, param_name); /* fetch value (if possible) */
@@ -421,7 +420,9 @@ static int parse_SX1301_configuration(const char * conf_file) {
             MSG("INFO: no configuration for tx gain lut %i\n", i);
             continue;
         }
-        txlut.size++; /* update TX LUT size based on JSON object found in configuration file */
+        /* update TX LUT size based on JSON object found in configuration file */
+        txlut.size = (txlut.size > i) ? txlut.size : i + 1;
+
         /* there is an object to configure that TX gain index, let's parse it */
         snprintf(param_name, sizeof param_name, "tx_lut_%i.pa_gain", i);
         val = json_object_dotget_value(conf_obj, param_name);
@@ -1128,6 +1129,8 @@ int main(int argc, char *argv[])
     #else
         MSG("INFO: Host endianness unknown\n");
     #endif
+
+    memset(&txlut, 0, sizeof txlut); /* initialize configuration structure */
 
     /* load configuration files */
     if (access(debug_cfg_path, R_OK) == 0) { /* if there is a debug conf, parse only the debug conf */
