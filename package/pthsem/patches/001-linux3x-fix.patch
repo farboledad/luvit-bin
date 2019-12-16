@@ -5,7 +5,7 @@
  changequote(, )dnl
              x2.[23456789]* ) ;;
 +changequote(, )dnl
-+            x[34].* ) ;;
++            x[345].* ) ;;
  changequote([, ])
              * ) braindead=yes ;;
          esac
