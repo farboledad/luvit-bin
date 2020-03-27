@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
-#include <termio.h>
+#include <termios.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
 #include <errno.h>
 

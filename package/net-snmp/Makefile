@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=net-snmp
-PKG_VERSION:=5.7.3
-PKG_RELEASE:=6
+PKG_VERSION:=5.8
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=@SF/$(PKG_NAME)
-PKG_MD5SUM:=d4a3459e1577d0efa8d96ca70a885e53
+PKG_MD5SUM:=63bfc65fbb86cdb616598df1aff6458a
 PKG_FIXUP = libtool no-autoreconf
 
 include $(INCLUDE_DIR)/package.mk

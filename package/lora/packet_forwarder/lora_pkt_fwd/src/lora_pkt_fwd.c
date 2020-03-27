@@ -987,7 +987,8 @@ static struct argp_option options[] = {
     {"local",  'l', "FILE", 0, "local json file location",  0},
     {"debug",  'd', "FILE", 0, "debug json file location",  0},
     {"json",   'j', "STR",  0, "json string",               0},
-    {"public", 'p', "NUM",  0, "public/private network",    0}
+    {"public", 'p', "NUM",  0, "public/private network",    0},
+    { 0 }
 };
 
 typedef struct arguments {

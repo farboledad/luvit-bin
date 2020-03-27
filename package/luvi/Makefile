@@ -33,7 +33,7 @@ define Package/luvi
   TITLE:=A project in-between luv and luvit
   URL:=https://github.com/luvit/luvi
   MAINTAINER:=Option <support@option.com>
-  DEPENDS:=+libopenssl +libuv +luajit +luv +libpthread +librt
+  DEPENDS:=+libopenssl +libuv +luajit +luv +libpthread +librt +zlib
 endef
 
 define Package/luvi/config

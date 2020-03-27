@@ -431,13 +431,13 @@ int lgw_board_setconf(struct lgw_conf_board_s conf) {
     return LGW_HAL_SUCCESS;
 }
 
-int lgw_board_setpublic(bool lorawan_public) {
+int lgw_board_setpublic(bool public) {
     /* check if the concentrator is running */
     if (lgw_is_started == true) {
         DEBUG_MSG("ERROR: CONCENTRATOR IS RUNNING, STOP IT BEFORE TOUCHING CONFIGURATION\n");
         return LGW_HAL_ERROR;
     }
-    lorawan_public = lorawan_public;
+    lorawan_public = public;
     DEBUG_PRINTF("Note: board configuration; lorawan_public:%d, clksrc:%d\n", lorawan_public, rf_clkout);
     return LGW_HAL_SUCCESS;
 }
@@ -1093,7 +1093,7 @@ int lgw_start(void) {
 
     /* */
     if (lbt_is_enabled() == true) {
-        DEBUG_PRINTF("INFO: Configuring LBT, this may take few seconds, please wait...\n");
+        DEBUG_MSG("INFO: Configuring LBT, this may take few seconds, please wait...\n");
         wait_ms(8400);
     }
 

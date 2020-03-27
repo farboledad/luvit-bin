@@ -12,7 +12,7 @@ PKG_NAME:=LuaJIT
 
 PKG_RELEASE:=1
 #PKG_REV used in pc luvi script
-PKG_REV2_1:=70f4b15ee45a6137fe6b48b941faea79d72f7159
+PKG_REV2_1:=dfa692b746c9de067857d5fc992a41730be3d99a
 PKG_REV2_0:=fb5e522fbc0750c838ef6a926b11c5d870826183
 
 ifeq ($(CONFIG_LUAJIT_TWO_ONE),y)
@@ -78,22 +78,29 @@ endef
 define Download/Defaults
 endef
 
+XCFLAGS:=-DLUAJIT_DISABLE_GC64 -DLUAJIT_ENABLE_LUA52COMPAT
+
 define Build/Compile
 	@echo ">>>> Building CloudGate version $(PKG_VERSION) lib $(PKG_LIB_VERSION)"
 	$(MAKE) -C $(PKG_BUILD_DIR) \
-		HOST_CC="gcc -m32" \
+		HOST_CC="$(HOSTCC) -m32" \
 		CROSS=$(TARGET_CROSS) \
 		TARGET_CFLAGS="$(TARGET_CFLAGS)" \
 		HOST_CFLAGS="$(HOST_CFLAGS)" \
+		XCFLAGS="$(XCFLAGS)" \
 		TARGET_LDFLAGS="$(TARGET_LDFLAGS)" \
 		HOST_LDFLAGS="$(HOST_LDFLAGS)" \
 		DESTDIR="$(PKG_INSTALL_DIR)" \
 		PREFIX=/usr \
 		INSTALL_LMOD="/usr/share/lua" \
 		INSTALL_CMOD="/usr/share/lua" \
-		STAGING_DIR_HOST=$(STAGING_DIR_HOST) amalg
+		STAGING_DIR_HOST=$(STAGING_DIR_HOST) \
+		BUILDMODE=dynamic \
+		amalg
+	rm -rf $(PKG_INSTALL_DIR)
+	mkdir -p $(PKG_INSTALL_DIR)
 	$(MAKE) PREFIX=$(PKG_BUILD_DIR)/usr -C $(PKG_BUILD_DIR) \
-		HOST_CC="gcc -m32" \
+		HOST_CC="$(HOSTCC)-m32" \
 		CROSS=$(TARGET_CROSS) \
 		TARGET_CFLAGS="$(TARGET_CFLAGS)" \
 		HOST_CFLAGS="$(HOST_CFLAGS)" \
@@ -128,6 +135,7 @@ endef
 define Host/Compile
 	@echo ">>>> Building host version $(PKG_VERSION) lib $(PKG_LIB_VERSION)"
 	$(MAKE) -C $(HOST_BUILD_DIR) \
+		XCFLAGS="$(XCFLAGS)" \
 		PREFIX="$(STAGING_DIR_HOST)" \
 		INSTALL_LMOD="" \
 		INSTALL_CMOD="" \
