@@ -12,9 +12,9 @@ PKG_RELEASE:=5
 PKG_SOURCE_PROTO:=git
 
 PKG_SOURCE_URL:=git://github.com/luvitred/luvi.git
-PKG_REV:=67954c511c9f821c98c6a873e87bb06fe322474f
-PKG_BRANCH:=v1.32
-PKG_DATE:="2019-07-01"
+PKG_REV:=c0912b8b78df34ce92d5bdd915326adaff903afe
+PKG_BRANCH:=v1.38
+PKG_DATE:="2020-05-01"
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
@@ -33,7 +33,7 @@ define Package/luvi
   TITLE:=A project in-between luv and luvit
   URL:=https://github.com/luvit/luvi
   MAINTAINER:=Option <support@option.com>
-  DEPENDS:=+libopenssl +libuv +luajit +luv +libpthread +librt
+  DEPENDS:=+libopenssl +libuv +luajit +luv +libpthread +librt +zlib
 endef
 
 define Package/luvi/config
@@ -148,8 +148,8 @@ define Build/Configure
 endef
 
 define Build/InstallDev
-	$(INSTALL_DIR) $(STAGING_DIR)/usr/share
-	$(CP) $(PKG_BUILD_DIR)/luvi $(STAGING_DIR)/usr/share/luvi
+	$(INSTALL_DIR) $(1)/usr/share
+	$(CP) $(PKG_BUILD_DIR)/luvi $(1)/usr/share/luvi
 endef
 
 ifeq ($(CONFIG_LUVI_NO_LUVI),y)

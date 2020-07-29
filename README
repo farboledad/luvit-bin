@@ -5,12 +5,25 @@ Supported Platforms:
 
 * Ubuntu 14.04 LTS
 * Ubuntu 16.04 LTS
-* Ubuntu 18.04 LTS (experimental)
+* Ubuntu 18.04 LTS
+* Ubuntu 20.04 LTS (experimental)
 
+Only 64bit hosts have been tested.
 
-1) Untar the luvit-bin.tar.gz file to your CloudGate SDK root directory
+1) Setup SDK
+
+Each luvitred version has a minimum firmware version. It is best to match this minimum version with the sdk version.
+
+Extract the sdk:
+
+tar -xvjf CloudGate-SDK-x86_64-v2.91.2.tar.bz2
+
+The location of the extracted SDK is further referenced as SDK_ROOT.
+
+Untar the luvit-bin.tar.gz file to your CloudGate SDK root directory:
 
 cd SDK_ROOT
+rm -rf packages/dallas-sdk
 tar xvzf luvit-bin.tar.gz
 
 
@@ -27,12 +40,15 @@ The following packages are required to compile the LuvitRED binary package on th
   * libncurses5-dev
   * zlib1g-dev
   * luajit
+  * python
 
 These can be installed by apt-get install:
 
 sudo apt-get install g++ cmake gawk flex git subversion libncurses5-dev zlib1g-dev luajit
 
 Check the git version (git --version). If is is not 2.x then install git manually from https://git-scm.com
+
+Make sure python links to either python2 or python3.
 
 If you want to cross-compile luajit from a 64-bit host, you need to install the multilib development package as well:
 
@@ -51,7 +67,9 @@ luvitred.init.sh - this script needs to be run once each time the CloudGate boot
 luvitred.run.sh  - this script actually runs LuvitRED (and the SNMP config UI). This script does not return. If you run it
                    from your script you should put it in the background ./luvitred.run.sh &
 isv              - this is the default isv script for LuvitRED. It just runs the other two scripts. To make sure that your
-                   custom isv script overwrites this make luvit-bin depend on your package by adding it as a dependency.
+                   custom isv script overwrites this make luvit-bin depend on your package by adding it as a dependency. The
+                   actual overwriting happens in the install step, which is done alphabetically per package so you may need to
+                   change your package name.
 
 e.g.
 

@@ -28,7 +28,7 @@ endef
 OPTS = CC="$(TARGET_CC)" \
 		LD="$(TARGET_LD)" \
 		CFLAGS="$(TARGET_CFLAGS) $(TARGET_CPPFLAGS) $(FPIC) -Wfatal-errors -Wall -Wextra -std=c99 -Iinc -I." \
-		LIBS="$(TARGET_LDFLAGS) -lloragw -lrt -lm -lpthread -largp"
+		LIBS="$(TARGET_LDFLAGS) -lloragw -lrt -lm -lpthread -largp -lcg"
 
 define Build/Compile
 	# compile test tools

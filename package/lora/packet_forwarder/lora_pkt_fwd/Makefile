@@ -2,7 +2,7 @@
 
 APP_NAME := lora_pkt_fwd
 
-### Environment constants 
+### Environment constants
 
 LGW_PATH ?= ../../lora_gateway/libloragw
 ARCH ?=
@@ -38,7 +38,7 @@ LGW_INC += $(LGW_PATH)/inc/loragw_gps.h
 
 ### Linking options
 
-LIBS := -lloragw -lrt -lpthread -lm
+LIBS := -lloragw -lrt -lpthread -lm -largp -lcg
 
 ### General build targets
 

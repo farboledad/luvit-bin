@@ -48,6 +48,10 @@ Maintainer: Michael Coracin
 
 #include <pthread.h>
 
+/* cg gps */
+#include <libcg/cg_gps.h>
+#include <libcg/cg_general.h>
+
 #include "trace.h"
 #include "jitqueue.h"
 #include "timersync.h"
@@ -157,7 +161,8 @@ static bool xtal_correct_ok = false; /* set true when XTAL correction is stable 
 static double xtal_correct = 1.0;
 
 /* GPS configuration and synchronization */
-static char gps_tty_path[64] = "\0"; /* path of the TTY port GPS is connected on */
+static bool cg_gps_enabled = false;
+//static char gps_tty_path[64] = "\0"; /* path of the TTY port GPS is connected on */
 static int gps_tty_fd = -1; /* file descriptor of the GPS TTY port */
 static bool gps_enabled = false; /* is GPS enabled on that gateway ? */
 
@@ -251,10 +256,13 @@ static void gps_process_sync(void);
 
 static void gps_process_coords(void);
 
+static void cg_gps_nmea_cb(const char *nmea_data, void *context);
+
 /* threads */
 void thread_up(void);
 void thread_down(void);
 void thread_gps(void);
+void thread_cg_gps(void);
 void thread_valid(void);
 void thread_jit(void);
 void thread_timersync(void);
@@ -278,10 +286,12 @@ static int parse_SX1301_configuration(const char * conf_file) {
     const char conf_obj_name[] = "SX1301_conf";
     JSON_Value *root_val = NULL;
     JSON_Object *conf_obj = NULL;
-    JSON_Object *conf_lbt_obj = NULL;
-    JSON_Object *conf_lbtchan_obj = NULL;
     JSON_Value *val = NULL;
-    JSON_Array *conf_array = NULL;
+    #if LBT_ENABLED
+    // JSON_Object *conf_lbt_obj = NULL;
+    // JSON_Object *conf_lbtchan_obj = NULL;
+    // JSON_Array *conf_array = NULL;
+    #endif
     struct lgw_conf_board_s boardconf;
     struct lgw_conf_lbt_s lbtconf;
     struct lgw_conf_rxrf_s rfconf;
@@ -329,6 +339,7 @@ static int parse_SX1301_configuration(const char * conf_file) {
 
     /* set LBT configuration */
     memset(&lbtconf, 0, sizeof lbtconf); /* initialize configuration structure */
+    #if LBT_ENABLED
     conf_lbt_obj = json_object_get_object(conf_obj, "lbt_cfg"); /* fetch value (if possible) */
     if (conf_lbt_obj == NULL) {
         MSG("INFO: no configuration for LBT\n");
@@ -399,6 +410,7 @@ static int parse_SX1301_configuration(const char * conf_file) {
             MSG("INFO: LBT is disabled\n");
         }
     }
+    #endif
 
     /* set antenna gain configuration */
     val = json_object_get_value(conf_obj, "antenna_gain"); /* fetch value (if possible) */
@@ -753,11 +765,13 @@ static int parse_gateway_configuration(const char * string, bool file) {
     MSG("INFO: packets received with no CRC will%s be forwarded\n", (fwd_nocrc_pkt ? "" : " NOT"));
 
     /* GPS module TTY path (optional) */
+    /*
     str = json_object_get_string(conf_obj, "gps_tty_path");
     if (str != NULL) {
         strncpy(gps_tty_path, str, sizeof gps_tty_path);
         MSG("INFO: GPS serial port path is configured to \"%s\"\n", gps_tty_path);
     }
+    */
 
     /* get reference coordinates */
     val = json_object_get_value(conf_obj, "ref_latitude");
@@ -787,7 +801,19 @@ static int parse_gateway_configuration(const char * string, bool file) {
         }
     }
 
+    /* CG gps enable */
+    val = json_object_get_value(conf_obj, "cg_gps");
+    if (json_value_get_type(val) == JSONBoolean) {
+        cg_gps_enabled = (bool) json_value_get_boolean(val);
+        if (cg_gps_enabled == true) {
+            MSG("INFO: CG GPS is enabled\n");
+        } else {
+            MSG("INFO: CG GPS is disabled\n");
+        }
+    }
+
     /* Beacon signal period (optional) */
+    /*
     val = json_object_get_value(conf_obj, "beacon_period");
     if (val != NULL) {
         beacon_period = (uint32_t)json_value_get_number(val);
@@ -798,6 +824,7 @@ static int parse_gateway_configuration(const char * string, bool file) {
             MSG("INFO: Beaconing period is configured to %u seconds\n", beacon_period);
         }
     }
+    */
 
     /* Beacon TX frequency (optional) */
     val = json_object_get_value(conf_obj, "beacon_freq_hz");
@@ -987,7 +1014,8 @@ static struct argp_option options[] = {
     {"local",  'l', "FILE", 0, "local json file location",  0},
     {"debug",  'd', "FILE", 0, "debug json file location",  0},
     {"json",   'j', "STR",  0, "json string",               0},
-    {"public", 'p', "NUM",  0, "public/private network",    0}
+    {"public", 'p', "NUM",  0, "public/private network",    0},
+    { 0 }
 };
 
 typedef struct arguments {
@@ -1063,8 +1091,11 @@ int main(int argc, char *argv[])
     /* threads */
     pthread_t thrid_up;
     pthread_t thrid_down;
+    /*
     pthread_t thrid_gps;
     pthread_t thrid_valid;
+    */
+    pthread_t thrid_cg_gps;
     pthread_t thrid_jit;
     pthread_t thrid_timersync;
 
@@ -1181,8 +1212,11 @@ int main(int argc, char *argv[])
     }
 
     /* Start GPS a.s.a.p., to allow it to lock */
-    if (gps_tty_path[0] != '\0') { /* do not try to open GPS device if no path set */
-        i = lgw_gps_enable(gps_tty_path, "ubx7", 0, &gps_tty_fd); /* HAL only supports u-blox 7 for now */
+    /* do not try to open GPS device if no path set */
+    /* HAL only supports u-blox 7 for now */
+    /*
+    if (gps_tty_path[0] != '\0') {
+        i = lgw_gps_enable(gps_tty_path, "ubx7", 0, &gps_tty_fd);
         if (i != LGW_GPS_SUCCESS) {
             MSG("WARNING: [main] impossible to open %s for GPS sync (check permissions)\n", gps_tty_path);
             gps_enabled = false;
@@ -1192,6 +1226,13 @@ int main(int argc, char *argv[])
             gps_enabled = true;
             gps_ref_valid = false;
         }
+    }
+    */
+
+    if (cg_gps_enabled) {
+        // on CG boot the modem is not available yet so a loop required
+        cg_init("lora_gps");
+        pthread_create( &thrid_cg_gps, NULL, (void * (*)(void *))thread_cg_gps, NULL);
     }
 
     /* get timezone info */
@@ -1305,6 +1346,7 @@ int main(int argc, char *argv[])
     }
 
     /* spawn thread to manage GPS */
+    /*
     if (gps_enabled == true) {
         i = pthread_create( &thrid_gps, NULL, (void * (*)(void *))thread_gps, NULL);
         if (i != 0) {
@@ -1317,6 +1359,7 @@ int main(int argc, char *argv[])
             exit(EXIT_FAILURE);
         }
     }
+    */
 
     /* configure signal handling */
     sigemptyset(&sigact.sa_mask);
@@ -1495,9 +1538,10 @@ int main(int argc, char *argv[])
     pthread_cancel(thrid_down); /* don't wait for downstream thread */
     pthread_cancel(thrid_jit); /* don't wait for jit thread */
     pthread_cancel(thrid_timersync); /* don't wait for timer sync thread */
+    /*
     if (gps_enabled == true) {
-        pthread_cancel(thrid_gps); /* don't wait for GPS thread */
-        pthread_cancel(thrid_valid); /* don't wait for validation thread */
+        pthread_cancel(thrid_gps);
+        pthread_cancel(thrid_valid);
 
         i = lgw_gps_disable(gps_tty_fd);
         if (i == LGW_HAL_SUCCESS) {
@@ -1505,6 +1549,13 @@ int main(int argc, char *argv[])
         } else {
             MSG("WARNING: failed to close GPS successfully\n");
         }
+    }
+    */
+    if (cg_gps_enabled) {
+        pthread_cancel(thrid_cg_gps);
+        cg_gps_register_nmea_callback(cg_gps_nmea_cb, NULL);
+        cg_gps_set_enabled(0);
+        cg_deinit();
     }
 
     /* if an exit signal was received, try to quit properly */
@@ -1602,6 +1653,7 @@ void thread_up(void) {
         }
 
         /* get a copy of GPS time reference (avoid 1 mutex per packet) */
+        /*
         if ((nb_pkt > 0) && (gps_enabled == true)) {
             pthread_mutex_lock(&mx_timeref);
             ref_ok = gps_ref_valid;
@@ -1610,6 +1662,7 @@ void thread_up(void) {
         } else {
             ref_ok = false;
         }
+        */
 
         /* start composing datagram with the header */
         token_h = (uint8_t)rand(); /* random token */
@@ -2199,19 +2252,6 @@ void thread_down(void) {
                     next_beacon_gps_time.tv_sec += (retry * beacon_period);
                     next_beacon_gps_time.tv_nsec = 0;
 
-#if DEBUG_BEACON
-                    {
-                    time_t time_unix;
-
-                    time_unix = time_reference_gps.gps.tv_sec + UNIX_GPS_EPOCH_OFFSET;
-                    MSG_DEBUG(DEBUG_BEACON, "GPS-now : %s", ctime(&time_unix));
-                    time_unix = last_beacon_gps_time.tv_sec + UNIX_GPS_EPOCH_OFFSET;
-                    MSG_DEBUG(DEBUG_BEACON, "GPS-last: %s", ctime(&time_unix));
-                    time_unix = next_beacon_gps_time.tv_sec + UNIX_GPS_EPOCH_OFFSET;
-                    MSG_DEBUG(DEBUG_BEACON, "GPS-next: %s", ctime(&time_unix));
-                    }
-#endif
-
                     /* convert GPS time to concentrator time, and set packet counter for JiT trigger */
                     lgw_gps2cnt(time_reference_gps, next_beacon_gps_time, &(beacon_pkt.count_us));
                     pthread_mutex_unlock(&mx_timeref);
@@ -2356,7 +2396,8 @@ void thread_down(void) {
                         json_value_free(root_val);
                         continue;
                     }
-                    if (gps_enabled == true) {
+                    // if (gps_enabled == true) {
+                    if (0) {
                         pthread_mutex_lock(&mx_timeref);
                         if (gps_ref_valid == true) {
                             local_ref = time_reference_gps;
@@ -2888,6 +2929,49 @@ void thread_gps(void) {
         }
     }
     MSG("\nINFO: End of GPS thread\n");
+}
+
+static void cg_gps_nmea_cb(const char *nmea_data, void *context)
+{
+    (void) context;
+    // only one complete sentence per nmea data callback
+    size_t len = strlen(nmea_data);
+    size_t idx = 0;
+    size_t frame_size = 0;
+    enum gps_msg latest_msg = 0;
+    char *nmea_end_ptr;
+
+    MSG("NMEA: %s", nmea_data);
+    if (nmea_data[idx] == '$') {
+        nmea_end_ptr = memchr(&nmea_data[idx], (int) '\n', (len - idx));
+        if (nmea_end_ptr) {
+            frame_size = nmea_end_ptr - &nmea_data[idx];
+            latest_msg = lgw_parse_nmea(&nmea_data[idx], frame_size);
+
+            if(latest_msg == INVALID || latest_msg == UNKNOWN) {
+                /* checksum failed */
+                frame_size = 0;
+            } else if (latest_msg == NMEA_RMC) { /* Get location from RMC frames */
+                gps_process_coords();
+            }
+        }
+    }
+}
+
+void thread_cg_gps(void)
+{
+    while (!gps_enabled) {
+        cg_status_t status = CG_STATUS_OK;
+        cg_gps_set_enabled(0);
+        status |= cg_gps_set_reporting_interval(5*60);
+        status |= cg_gps_set_enabled(1);
+        status |= cg_gps_register_nmea_callback(cg_gps_nmea_cb, NULL);
+
+        if (status == CG_STATUS_OK) {
+            gps_enabled = true;
+        }
+        wait_ms(10000);
+    }
 }
 
 /* -------------------------------------------------------------------------- */

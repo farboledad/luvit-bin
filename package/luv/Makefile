@@ -1,14 +1,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luv
-PKG_VERSION:=1.32
+PKG_VERSION:=1.38
 PKG_RELEASE:=1
 PKG_SOURCE_PROTO:=git
 
 PKG_SOURCE_URL:=git://github.com/luvitred/luv.git
-PKG_REV:=02f8b2531d8ed3fbb4f6d8b7b409bcca65f9df2e
+PKG_REV:=95758317814abcba1eba9027dfffbbc1f598f5ee
 PKG_BRANCH:=v$(PKG_VERSION)
-PKG_DATE:="2019-07-01"
+PKG_DATE:="2020-05-01"
 
 PKG_SOURCE_VERSION:=$(PKG_REV)
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
@@ -51,7 +51,7 @@ endif
 CMAKE_OPTIONS += \
 	-H. -Bbuild \
 	-DBUILD_MODULE=OFF \
-	-DBUILD_SHARED_LIBS=OFF \
+	-DBUILD_STATIC_LIBS=ON \
 	-DWITH_SHARED_LIBUV=ON \
 	-DLUA_BUILD_TYPE=System \
 	-DLUA_COMPAT53_DIR="$(PKG_BUILD_DIR)/deps/lua-compat-5.3" \
@@ -107,18 +107,18 @@ define Build/Compile
 endef
 
 define Build/InstallDev
-	$(INSTALL_DIR) $(STAGING_DIR)/usr/include
-	$(INSTALL_DIR) $(STAGING_DIR)/usr/include/luv
-	$(CP) $(PKG_BUILD_DIR)/src/*.h $(STAGING_DIR)/usr/include/luv/
-	$(INSTALL_DIR) $(STAGING_DIR)/usr/include/c-api
-	$(CP) $(PKG_BUILD_DIR)/deps/lua-compat-5.3/c-api/* $(STAGING_DIR)/usr/include/c-api
-	$(CP) $(PKG_BUILD_DIR)/deps/lua-compat-5.3/lprefix.h $(STAGING_DIR)/usr/include/
-	$(CP) $(PKG_BUILD_DIR)/deps/lua-compat-5.3/lstrlib.c $(STAGING_DIR)/usr/include/
-	$(CP) $(PKG_BUILD_DIR)/deps/lua-compat-5.3/ltablib.c $(STAGING_DIR)/usr/include/
-	$(CP) $(PKG_BUILD_DIR)/deps/lua-compat-5.3/lutf8lib.c $(STAGING_DIR)/usr/include/
-	$(CP) $(TOOLCHAIN_DIR)/include/errno.h $(STAGING_DIR)/include/
-	$(INSTALL_DIR) $(STAGING_DIR)/usr/lib
-	$(CP) $(PKG_BUILD_DIR)/build/libluv.a $(STAGING_DIR)/usr/lib/
+	$(INSTALL_DIR) $(1)/usr/include/luv
+	$(CP) $(PKG_BUILD_DIR)/src/*.h $(1)/usr/include/luv/
+	$(INSTALL_DIR) $(1)/usr/include/c-api
+	$(CP) $(PKG_BUILD_DIR)/deps/lua-compat-5.3/c-api/* $(1)/usr/include/c-api
+	$(CP) $(PKG_BUILD_DIR)/deps/lua-compat-5.3/lprefix.h $(1)/usr/include/
+	$(CP) $(PKG_BUILD_DIR)/deps/lua-compat-5.3/lstrlib.c $(1)/usr/include/
+	$(CP) $(PKG_BUILD_DIR)/deps/lua-compat-5.3/ltablib.c $(1)/usr/include/
+	$(CP) $(PKG_BUILD_DIR)/deps/lua-compat-5.3/lutf8lib.c $(1)/usr/include/
+	$(INSTALL_DIR) $(1)/include
+	$(CP) $(TOOLCHAIN_DIR)/include/errno.h $(1)/include/
+	$(INSTALL_DIR) $(1)/usr/lib
+	$(CP) $(PKG_BUILD_DIR)/build/libluv_a.a $(1)/usr/lib/libluv.a
 endef
 
 $(eval $(call BuildPackage,luv))

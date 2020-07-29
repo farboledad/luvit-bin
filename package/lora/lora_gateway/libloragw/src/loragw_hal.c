@@ -29,7 +29,9 @@ Maintainer: Sylvain Miermont
 #include "loragw_spi.h"
 #include "loragw_radio.h"
 #include "loragw_fpga.h"
+#if LBT_ENABLED
 #include "loragw_lbt.h"
+#endif
 
 /* -------------------------------------------------------------------------- */
 /* --- PRIVATE MACROS ------------------------------------------------------- */
@@ -444,6 +446,7 @@ int lgw_board_setpublic(bool public) {
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
+#if LBT_ENABLED
 int lgw_lbt_setconf(struct lgw_conf_lbt_s conf) {
     int x;
 
@@ -461,6 +464,7 @@ int lgw_lbt_setconf(struct lgw_conf_lbt_s conf) {
 
     return LGW_HAL_SUCCESS;
 }
+#endif
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
@@ -762,6 +766,7 @@ int lgw_start(void) {
     lgw_reg_w(LGW_GPIO_SELECT_OUTPUT,2);
 
     /* Configure LBT */
+    #if LBT_ENABLED
     if (lbt_is_enabled() == true) {
         lgw_reg_w(LGW_CLK32M_EN, 1);
         i = lbt_setup();
@@ -778,6 +783,7 @@ int lgw_start(void) {
             return LGW_HAL_ERROR;
         }
     }
+    #endif
 
     /* Enable clocks */
     lgw_reg_w(LGW_GLOBAL_EN, 1);
@@ -1092,10 +1098,12 @@ int lgw_start(void) {
     lgw_reg_w(LGW_GPS_EN, 1);
 
     /* */
+    #if LBT_ENABLED
     if (lbt_is_enabled() == true) {
         DEBUG_MSG("INFO: Configuring LBT, this may take few seconds, please wait...\n");
         wait_ms(8400);
     }
+    #endif
 
     lgw_is_started = true;
     return LGW_HAL_SUCCESS;
@@ -1613,11 +1621,15 @@ int lgw_send(struct lgw_pkt_tx_s pkt_data) {
     lgw_reg_wb(LGW_TX_DATA_BUF_DATA, buff, transfer_size);
     DEBUG_ARRAY(i, transfer_size, buff);
 
+    #if LBT_ENABLED
     x = lbt_is_channel_free(&pkt_data, tx_start_delay, &tx_allowed);
     if (x != LGW_LBT_SUCCESS) {
         DEBUG_MSG("ERROR: Failed to check channel availability for TX\n");
         return LGW_HAL_ERROR;
     }
+    #else
+    tx_allowed = true;
+    #endif
     if (tx_allowed == true) {
         switch(pkt_data.tx_mode) {
             case IMMEDIATE:

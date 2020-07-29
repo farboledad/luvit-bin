@@ -2,21 +2,25 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libuv
-PKG_VERSION:=1.32
+PKG_VERSION:=1.38
 PKG_RELEASE:=1
 PKG_SOURCE_PROTO:=git
 
 PKG_SOURCE_URL:=https://github.com/luvitred/libuv.git
-PKG_REV:=bf381d3c41cb37bb7c980a16979ea6456cdd1f37
+PKG_REV:=e8eb03fb3617df80fc93449a7f179e66ce20e0eb
 PKG_BRANCH:=v$(PKG_VERSION)
-PKG_DATE:="2019-07-01"
+PKG_DATE:="2020-04-01"
 
 PKG_SOURCE_VERSION:=$(PKG_REV)
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_REV).tar.gz
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_SOURCE_SUBDIR)
 
+CMAKE_INSTALL:=0
+CMAKE_OPTIONS+=-DLIBUV_BUILD_TESTS=OFF
+
 include $(INCLUDE_DIR)/package.mk
+include $(INCLUDE_DIR)/cmake.mk
 
 define Package/libuv
   SECTION:=libs
@@ -52,40 +56,17 @@ define DownloadMethod/git
     )
 endef
 
-# CONFIGURE_ARGS += --enable-static --disable-shared
-TARGET_CFLAGS += -pthread
-TARGET_LDFLAGS += -pthread
-
-define Build/Configure
-	(cd $(PKG_BUILD_DIR); echo "Running autogen.sh ..."; ./autogen.sh );
-	$(call Build/Configure/Default)
-endef
-
-define Build/Compile
-	$(MAKE_VARS) \
-	$(MAKE) -C $(PKG_BUILD_DIR)/$(MAKE_PATH) \
-		$(MAKE_FLAGS) \
-		libuv.la
-endef
-
 define Build/InstallDev
-	$(INSTALL_DIR) $(STAGING_DIR)/usr/include
-	$(INSTALL_DIR) $(STAGING_DIR)/usr/include/uv
-	$(CP) $(PKG_BUILD_DIR)/include/uv/linux.h $(STAGING_DIR)/usr/include/uv/
-	$(CP) $(PKG_BUILD_DIR)/include/uv/unix.h $(STAGING_DIR)/usr/include/uv/
-	$(CP) $(PKG_BUILD_DIR)/include/uv/errno.h $(STAGING_DIR)/usr/include/uv/
-	$(CP) $(PKG_BUILD_DIR)/include/uv/version.h $(STAGING_DIR)/usr/include/uv
-	$(CP) $(PKG_BUILD_DIR)/include/uv/threadpool.h $(STAGING_DIR)/usr/include/uv
-	$(CP) $(PKG_BUILD_DIR)/include/uv.h $(STAGING_DIR)/usr/include/
-	$(INSTALL_DIR) $(STAGING_DIR)/usr/lib
-	$(CP) $(PKG_BUILD_DIR)/.libs/libuv.a $(STAGING_DIR)/usr/lib/
-	$(CP) $(PKG_BUILD_DIR)/.libs/libuv.so* $(STAGING_DIR)/usr/lib/
-endef
-
-define Package/libuv/install
-	$(INSTALL_DIR) $(1)/usr
+	$(INSTALL_DIR) $(1)/usr/include
+	$(INSTALL_DIR) $(1)/usr/include/uv
+	$(CP) $(PKG_BUILD_DIR)/include/uv/linux.h $(1)/usr/include/uv/
+	$(CP) $(PKG_BUILD_DIR)/include/uv/unix.h $(1)/usr/include/uv/
+	$(CP) $(PKG_BUILD_DIR)/include/uv/errno.h $(1)/usr/include/uv/
+	$(CP) $(PKG_BUILD_DIR)/include/uv/version.h $(1)/usr/include/uv
+	$(CP) $(PKG_BUILD_DIR)/include/uv/threadpool.h $(1)/usr/include/uv
+	$(CP) $(PKG_BUILD_DIR)/include/uv.h $(1)/usr/include/
 	$(INSTALL_DIR) $(1)/usr/lib
-	$(CP) $(PKG_BUILD_DIR)/.libs/libuv.so* $(1)/usr/lib
+	$(CP) $(PKG_BUILD_DIR)/libuv_a.a $(1)/usr/lib/libuv.a
 endef
 
 $(eval $(call BuildPackage,libuv))

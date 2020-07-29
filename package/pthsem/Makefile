@@ -15,6 +15,10 @@ PKG_INSTALL:=1
 
 include $(INCLUDE_DIR)/package.mk
 
+# The musl libc provides a proper implementation of sigaltstack() so
+# prevent configure from wrongly assuming a broken Linux platform
+CONFIGURE_ARGS += --with-mctx-dsp=ssjlj --with-mctx-stk=sas
+
 define Package/pthsem
   SECTION:=libs
   CATEGORY:=Libraries

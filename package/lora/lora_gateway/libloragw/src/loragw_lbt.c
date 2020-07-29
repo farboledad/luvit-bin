@@ -16,6 +16,8 @@ Maintainer: Michael Coracin
 /* -------------------------------------------------------------------------- */
 /* --- DEPENDANCIES --------------------------------------------------------- */
 
+#if LBT_ENABLED
+
 #include <stdint.h>     /* C99 types */
 #include <stdbool.h>    /* bool type */
 #include <stdio.h>      /* printf fprintf */
@@ -389,3 +391,5 @@ bool is_equal_freq(uint32_t a, uint32_t b) {
 }
 
 /* --- EOF ------------------------------------------------------------------ */
+
+#endif

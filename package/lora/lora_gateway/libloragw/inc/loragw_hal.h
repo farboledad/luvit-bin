@@ -316,7 +316,9 @@ int lgw_board_setpublic(bool lorawan_public);
 @param conf structure containing the configuration parameters
 @return LGW_HAL_ERROR id the operation failed, LGW_HAL_SUCCESS else
 */
+#if LBT_ENABLED
 int lgw_lbt_setconf(struct lgw_conf_lbt_s conf);
+#endif
 
 /**
 @brief Configure an RF chain (must configure before start)
