@@ -30,7 +30,7 @@ Maintainer: Michael Coracin
 #define MSG(args...)
 #define MSG_DEBUG(FLAG, fmt, ...)
 #else
-#define MSG(args...) printf(args) /* message that is destined to the user */
+#define MSG(args...) do { printf(args);fflush(stdout); } while(0)
 #define MSG_DEBUG(FLAG, fmt, ...)                                                                         \
             do  {                                                                                         \
                 if (FLAG)                                                                                 \
