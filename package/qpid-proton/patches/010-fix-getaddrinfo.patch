@@ -1,0 +1,46 @@
+Index: qpid-proton-0.8/proton-c/src/posix/io.c
+===================================================================
+--- qpid-proton-0.8.orig/proton-c/src/posix/io.c	2014-10-15 17:31:20.000000000 +0200
++++ qpid-proton-0.8/proton-c/src/posix/io.c	2015-04-02 15:54:16.914041946 +0200
+@@ -34,7 +34,7 @@
+ #include <unistd.h>
+ #include <fcntl.h>
+ #include <assert.h>
+-
++#include <string.h>
+ #include "platform.h"
+ 
+ #define MAX_HOST (1024)
+@@ -126,7 +126,14 @@
+ 
+ pn_socket_t pn_listen(pn_io_t *io, const char *host, const char *port)
+ {
+-  struct addrinfo *addr;
++  struct addrinfo *addr, hints;
++
++  memset(&hints, 0, sizeof(struct addrinfo));
++  hints.ai_flags=AI_PASSIVE;
++  hints.ai_family=AF_UNSPEC;
++  hints.ai_socktype=SOCK_STREAM;
++  hints.ai_protocol=IPPROTO_TCP;
++
+   int code = getaddrinfo(host, port, NULL, &addr);
+   if (code) {
+     pn_error_format(io->error, PN_ERR, "getaddrinfo(%s, %s): %s\n", host, port, gai_strerror(code));
+@@ -166,8 +173,14 @@
+ 
+ pn_socket_t pn_connect(pn_io_t *io, const char *host, const char *port)
+ {
+-  struct addrinfo *addr;
+-  int code = getaddrinfo(host, port, NULL, &addr);
++  struct addrinfo *addr, hints;
++
++  memset(&hints, 0, sizeof(struct addrinfo));
++  hints.ai_family=AF_UNSPEC;
++  hints.ai_socktype=SOCK_STREAM;
++  hints.ai_protocol=IPPROTO_TCP;
++
++  int code = getaddrinfo(host, port, &hints, &addr);
+   if (code) {
+     pn_error_format(io->error, PN_ERR, "getaddrinfo(%s, %s): %s", host, port, gai_strerror(code));
+     return PN_INVALID_SOCKET;
