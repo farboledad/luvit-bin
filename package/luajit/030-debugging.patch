@@ -1,0 +1,37 @@
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -55,9 +55,9 @@ CCOPT_ppc=
+ CCOPT_ppcspe=
+ CCOPT_mips=
+ #
+-CCDEBUG=
++# CCDEBUG=
+ # Uncomment the next line to generate debug information:
+-#CCDEBUG= -g
++CCDEBUG= -g
+ #
+ CCWARN= -Wall
+ # Uncomment the next line to enable more warnings:
+@@ -124,12 +124,12 @@ XCFLAGS=
+ # bundled memory allocator. This is slower, but sometimes helpful for
+ # debugging. It's helpful for Valgrind's memcheck tool, too. This option
+ # cannot be enabled on x64, since the built-in allocator is mandatory.
+-#XCFLAGS+= -DLUAJIT_USE_SYSMALLOC
++XCFLAGS+= -DLUAJIT_USE_SYSMALLOC
+ #
+ # This define is required to run LuaJIT under Valgrind. The Valgrind
+ # header files must be installed. You should enable debug information, too.
+ # Use --suppressions=lj.supp to avoid some false positives.
+ #XCFLAGS+= -DLUAJIT_USE_VALGRIND
+ #
+ # This is the client for the GDB JIT API. GDB 7.0 or higher is required
+ # to make use of it. See lj_gdbjit.c for details. Enabling this causes
+@@ -138,7 +138,7 @@ XCFLAGS=
+ #
+ # Turn on assertions for the Lua/C API to debug problems with lua_* calls.
+ # This is rather slow -- use only while developing C libraries/embeddings.
+-#XCFLAGS+= -DLUA_USE_APICHECK
++XCFLAGS+= -DLUA_USE_APICHECK
+ #
+ # Turn on assertions for the whole LuaJIT VM. This significantly slows down
+ # everything. Use only if you suspect a problem with LuaJIT itself.

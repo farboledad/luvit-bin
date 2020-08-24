@@ -1,0 +1,111 @@
+Instructions for including LuvitRED in your package build
+=========================================================
+
+Supported Platforms:
+
+* Ubuntu 14.04 LTS
+* Ubuntu 16.04 LTS
+* Ubuntu 18.04 LTS
+* Ubuntu 20.04 LTS (experimental)
+
+Only 64bit hosts have been tested.
+
+1) Setup SDK
+
+Each luvitred version has a minimum firmware version. It is best to match this minimum version with the sdk version.
+
+Extract the sdk:
+
+tar -xvjf CloudGate-SDK-x86_64-v2.91.2.tar.bz2
+
+The location of the extracted SDK is further referenced as SDK_ROOT.
+
+Untar the luvit-bin.tar.gz file to your CloudGate SDK root directory:
+
+cd SDK_ROOT
+rm -rf package/dallas-sdk
+tar xvzf luvit-bin.tar.gz
+
+
+2) Make sure that you have all the dependencies necessary for the build installed
+
+The following packages are required to compile the LuvitRED binary package on the CloudGate SDK:
+
+  * g++
+  * cmake (must be greater than 2.8.9. Use 'apt-cache policy cmake' to check your version.)
+  * gawk
+  * flex
+  * git (2.x)
+  * subversion
+  * libncurses5-dev
+  * zlib1g-dev
+  * luajit
+  * python
+
+These can be installed by apt-get install:
+
+sudo apt-get install g++ cmake gawk flex git subversion libncurses5-dev zlib1g-dev luajit
+
+Check the git version (git --version). If is is not 2.x then install git manually from https://git-scm.com
+
+Make sure python links to either python2 or python3.
+
+If you want to cross-compile luajit from a 64-bit host, you need to install the multilib development package as well:
+
+sudo apt-get install libc6-dev-i386
+
+
+3) The LuvitRED package needs to be started up and no doubt your package does as well. This requires integrating the
+'isv' script used by luvitRED with your isv scripts. There are several ways to achieve this:
+
+a) You want very manual control over this.
+
+There are 3 scripts that will be copied to the root directory of the image i.e. the one that will appear in '/rom/mnt/cust'
+on the CloudGate.
+
+luvitred.init.sh - this script needs to be run once each time the CloudGate boots
+luvitred.run.sh  - this script actually runs LuvitRED (and the SNMP config UI). This script does not return. If you run it
+                   from your script you should put it in the background ./luvitred.run.sh &
+isv              - this is the default isv script for LuvitRED. It just runs the other two scripts. To make sure that your
+                   custom isv script overwrites this make luvit-bin depend on your package by adding it as a dependency. The
+                   actual overwriting happens in the install step, which is done alphabetically per package so you may need to
+                   change your package name.
+
+e.g.
+
+                   define Package/mypackage
+                     SECTION:= base
+                     CATEGORY:= Base system
+                     TITLE:= My own package
+                     DEPENDS:= +luvit-bin
+                   endef
+
+Run the luvitred.init.sh and luvitred.run.sh files from your script or if necessary modify them to meet your needs.
+
+b) You would like a nice automated way to do this
+
+Use the example startup package. This allows you to integrate multiple packages simply.
+Structure your startup scripts in the same way as LuvitRED.
+
+mypackage.init.sh - What you want run just once
+mypackage.run.sh  - It is not necessary to define this unless you want the startup package to monitor your process. If
+                    you do then this script should not exit unless your package has crashed.
+
+
+Add a line to the list of modules in the startup makefile, SDK_ROOT/package/startup/Makefile.
+
+$(eval $(call BuildModule,[MODULE_NAME],[MODULE_TITLE],[MODULE_PACKAGE]))
+
+e.g.
+
+$(eval $(call BuildModule,mypackage,My Package,mypackage))
+
+You can now select the packages you want to build together in the base menu 'Combine CloudGate packages' option in
+make menuconfig.
+
+4) Compile
+
+cd SDK_ROOT
+make -j
+
+On errors run make V=s or make V=99 to see where the compilation failed.

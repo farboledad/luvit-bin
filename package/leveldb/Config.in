@@ -1,0 +1,9 @@
+# leveldb configuration
+menu "Configuration"
+	depends on PACKAGE_leveldb
+
+config LVLDB_TEST
+	bool "Install test executables"
+	default n
+
+endmenu

@@ -1,0 +1,14 @@
+Index: luv-1.0.0/src/dns.c
+===================================================================
+--- luv-1.0.0.orig/src/dns.c	2015-07-07 11:51:16.000000000 +0200
++++ luv-1.0.0/src/dns.c	2015-07-07 12:32:57.441630505 +0200
+@@ -107,7 +107,8 @@
+       hints->ai_family = luv_af_string_to_num(lua_tostring(L, -1));
+     }
+     else if (lua_isnil(L, -1)) {
+-      hints->ai_family = AF_UNSPEC;
++      // unless overriden force IPv4 on CloudGate
++      hints->ai_family = AF_INET;
+     }
+     else {
+       luaL_argerror(L, 3, "family hint must be string if set");

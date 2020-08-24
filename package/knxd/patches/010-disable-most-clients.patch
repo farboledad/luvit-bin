@@ -1,0 +1,14 @@
+Index: knxd-1.18/src/client/Makefile.am
+===================================================================
+--- knxd-1.18.orig/src/client/Makefile.am	2016-06-21 13:33:19.000000000 +0200
++++ knxd-1.18/src/client/Makefile.am	2016-06-21 14:26:50.821448863 +0200
+@@ -1,8 +1,2 @@
+-if BUILD_JAVA
+-BUILDJAVA = java
+-else
+-BUILDJAVA = 
+-endif
+-
+-SUBDIRS=def c $(BUILDJAVA) php perl cs python pascal ruby lua .
++SUBDIRS=def c
+ 

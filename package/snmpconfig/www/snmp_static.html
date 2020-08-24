@@ -1,0 +1,225 @@
+	<H2>SMNP</H2>
+	<form id="snmp_settings_form" class="well form-horizontal">
+		<fieldset>
+		<legend>System</legend>
+		<div class="control-group">
+
+			<label class="control-label" for="community">Community</label>
+			<div class="controls">
+				<input id="community" type="text" name="community"/>
+			</div>
+			<label class="control-label" for="sysContact">Contact</label>
+			<div class="controls">
+				<input id="sysContact" type="text" name="sysContact"/>
+			</div>
+			<label class="control-label" for="sysName">Name</label>
+			<div class="controls">
+				<input id="sysName" type="text" name="sysName"/>
+			</div>
+			<label class="control-label" for="sysLocation">Location</label>
+			<div class="controls">
+				<input id="sysLocation" type="text" name="sysLocation"/>
+			</div>
+			<label class="control-label" for="sysDescr">Description</label>
+			<div class="controls">
+				<input id="sysDescr" type="text" name="sysDescr"/>
+			</div>
+			<fieldset>
+				<legend>Trap server 1</legend>
+				<div class="control-group">
+
+				<label class="control-label" for="trapServer1">Server</label>
+				<div class="controls">
+					<input id="trapServer1" type="text" name="trapServer1"/>
+				</div>
+				<label class="control-label" for="trapCommunity1">Community</label>
+				<div class="controls">
+					<input id="trapCommunity1" type="text" name="trapCommunity1"/>
+				</div>
+				<label class="control-label" for="trapUpDown1">Send Up/Down Trap</label>
+				<div class="controls">
+					<input type="checkbox" id="trapUpDown1" name="trapUpDown1"/>
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>Trap server 2</legend>
+				<div class="control-group">
+
+				<label class="control-label" for="trapServer2">Server</label>
+				<div class="controls">
+					<input id="trapServer2" type="text" name="trapServer1"/>
+				</div>
+				<label class="control-label" for="trapCommunity2">Community</label>
+				<div class="controls">
+					<input id="trapCommunity2" type="text" name="trapCommunity2"/>
+				</div>
+				<label class="control-label" for="trapUpDown2">Send Up/Down Trap</label>
+				<div class="controls">
+					<input type="checkbox" id="trapUpDown2" name="trapUpDown2"/>
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>Trap server 3</legend>
+				<div class="control-group">
+
+				<label class="control-label" for="trapServer3">Server</label>
+				<div class="controls">
+					<input id="trapServer3" type="text" name="trapServer3"/>
+				</div>
+				<label class="control-label" for="trapCommunity3">Community</label>
+				<div class="controls">
+					<input id="trapCommunity3" type="text" name="trapCommunity3"/>
+				</div>
+				<label class="control-label" for="trapUpDown3">Send Up/Down Trap</label>
+				<div class="controls">
+					<input type="checkbox" id="trapUpDown3" name="trapUpDown3"/>
+				</div>
+			</fieldset>
+
+
+			<p id="SnmpStatus"></p>
+
+			<input type="button" value="Save" id="btnSnmpSave" name="btnSnmpSave" />
+			<input type="button" value="Cancel" id="btnSnmpCancel" name="btnSnmpCancel" />
+			<input type="button" value="Defaults" id="btnSnmpDefaults" name="btnSnmpDefaults" />
+		</div>
+	</form>
+	<form id="snmpd_status_form" class="well form-horizontal">
+		<fieldset>
+		<legend>Snmpd status</legend>
+			<p id="SnmpdStatus"></p>
+			<p id="SnmpdEnabled"></p>
+			<input type="button" value="Start" id="btnSnmpdStart" name="btnSnmpdStart" />
+			<input type="button" value="Enable" id="btnSnmpdEnable" name="btnSnmpdEnable" />
+		</fieldset>
+	</form>
+
+	Download Option Cloudgate MIB <a href="/snmp/OPTION-CLOUDGATE-MIB">here</a>
+<script type="text/javascript">
+
+function handle_snmp_settings_success(data){
+	var overview = $.parseJSON(JSON.stringify(data));
+	document.getElementById('community').value = overview.community;
+	document.getElementById('sysContact').value = overview.sysContact;
+	document.getElementById('sysName').value = overview.sysName;
+	document.getElementById('sysLocation').value = overview.sysLocation;
+	document.getElementById('sysDescr').value = overview.sysDescr;
+	var trapServer = overview.trapServer1;
+	document.getElementById('trapServer1').value = trapServer.substring(0,trapServer.indexOf(' '));
+	document.getElementById('trapCommunity1').value = trapServer.substring(trapServer.indexOf(' ')+1);
+	document.getElementById('trapUpDown1').checked = (overview.trapUpDown1 == "yes");
+	trapServer = overview.trapServer2;
+	document.getElementById('trapServer2').value = trapServer.substring(0,trapServer.indexOf(' '));
+	document.getElementById('trapCommunity2').value = trapServer.substring(trapServer.indexOf(' ')+1);
+	document.getElementById('trapUpDown2').checked = (overview.trapUpDown2 == "yes");
+	trapServer = overview.trapServer3;
+	document.getElementById('trapServer3').value = trapServer.substring(0,trapServer.indexOf(' '));
+	document.getElementById('trapCommunity3').value = trapServer.substring(trapServer.indexOf(' ')+1);
+	document.getElementById('trapUpDown3').checked = (overview.trapUpDown3 == "yes");
+	$('#SnmpStatus').html("Status  : <strong>Settings loaded..</strong>");
+}
+
+function handle_snmpd_status_success(data){
+	var overview = $.parseJSON(JSON.stringify(data));
+	if (overview.running == true)
+	{
+		$('#SnmpdStatus').html("<strong>snmpd running</strong>");
+		document.getElementById('btnSnmpdStart').value = "Stop";
+	}
+	else
+	{
+		$('#SnmpdStatus').html("<strong>snmpd stopped</strong>");
+		document.getElementById('btnSnmpdStart').value = "Start";
+	}
+	if (overview.enabled == true)
+	{
+		$('#SnmpdEnabled').html("<strong>snmpd enabled</strong>");
+		document.getElementById('btnSnmpdEnable').value = "Disable";
+	}
+	else
+	{
+		$('#SnmpdEnabled').html("<strong>snmpd disabled</strong>");
+		document.getElementById('btnSnmpdEnable').value = "Enable";
+	}
+}
+
+function handle_json_cb_error(data){
+	var overview = $.parseJSON(JSON.stringify(data));
+}
+
+function libcg_page_cb(identifier, json_data, callback_handler_success, callback_handler_error){
+	if(identifier != null && identifier != undefined){
+		var cb_url = "/api/libcg/" + identifier;
+		$.ajax({
+			url: cb_url,
+			type: "POST",
+			data: JSON.stringify(json_data),
+			dataType: "json",
+			contentType: "application/json; charset=utf-8",
+			success: callback_handler_success,
+			error: callback_handler_error
+		});
+	}
+}
+
+$(document).ready(function(){
+	$("#btnSnmpSave").click(function(){
+		$('#SnmpStatus').html("Status  : <strong>Saving settings ..</strong>");
+		var data = {};
+		data["community"]=document.getElementById('community').value;
+		data["sysContact"]=document.getElementById('sysContact').value;
+		data["sysName"]=document.getElementById('sysName').value;
+		data["sysLocation"]=document.getElementById('sysLocation').value;
+		data["sysDescr"]=document.getElementById('sysDescr').value;
+		data["trapServer1"]=document.getElementById('trapServer1').value + " " + document.getElementById('trapCommunity1').value;
+		data["trapUpDown1"]=(document.getElementById('trapUpDown1').checked?"yes":"no");
+		data["trapServer2"]=document.getElementById('trapServer2').value + " " + document.getElementById('trapCommunity2').value;
+		data["trapUpDown2"]=(document.getElementById('trapUpDown2').checked?"yes":"no");
+		data["trapServer3"]=document.getElementById('trapServer3').value + " " + document.getElementById('trapCommunity3').value;
+		data["trapUpDown3"]=(document.getElementById('trapUpDown3').checked?"yes":"no");
+		libcg_page_cb("set_snmp_settings_cb", data, handle_snmp_settings_success, handle_json_cb_error);
+	});
+
+	$("#btnSnmpCancel").click(function(){
+		libcg_page_cb("get_snmp_settings_cb", {}, handle_snmp_settings_success, handle_json_cb_error);
+	});
+
+	$("#myToggleButton").click(function(){
+		$('#SnmpStatus').html("Toggle button: " + document.getElementById('myToggleButton').checked);
+	});
+	$("#btnSnmpDefaults").click(function(){
+		$('#SnmpStatus').html("Status  : <strong>Reverting to default settings ..</strong>");
+		libcg_page_cb("set_snmp_defaults_cb", {}, handle_snmp_settings_success, handle_json_cb_error);
+	});
+	$("#btnSnmpdStart").click(function(){
+		if (document.getElementById('btnSnmpdStart').value == "Start")
+		{
+			$('#SnmpdStatus').html("<strong>snmpd starting</strong>");
+			libcg_page_cb("snmpd_start_cb", {}, handle_snmpd_status_success, handle_json_cb_error);
+		}
+		else
+		{
+			$('#SnmpdStatus').html("<strong>snmpd stopping</strong>");
+			libcg_page_cb("snmpd_stop_cb", {}, handle_snmpd_status_success, handle_json_cb_error);
+		}
+	});
+	$("#btnSnmpdEnable").click(function(){
+		if (document.getElementById('btnSnmpdEnable').value == "Enable")
+		{
+			$('#SnmpdEnabled').html("<strong>enabling snmpd</strong>");
+			libcg_page_cb("snmpd_enable_cb", {}, handle_snmpd_status_success, handle_json_cb_error);
+		}
+		else
+		{
+			$('#SnmpdEnabled').html("<strong>disabling snmpd</strong>");
+			libcg_page_cb("snmpd_disable_cb", {}, handle_snmpd_status_success, handle_json_cb_error);
+		}
+	});
+
+	// load the values for the settings fields
+	libcg_page_cb("get_snmp_settings_cb", {}, handle_snmp_settings_success, handle_json_cb_error);
+});
+
+var run = setInterval( function() {libcg_page_cb("get_status_cb", {}, handle_snmpd_status_success, handle_json_cb_error)}, 1000);
+
+</script>
