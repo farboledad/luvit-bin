@@ -1,9 +1,0 @@
-# lora configuration
-menu "Configuration"
-	depends on PACKAGE_lora
-
-config LORA_TEST
-	bool "Install test executables"
-	default n
-
-endmenu
