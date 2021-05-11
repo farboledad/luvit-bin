@@ -1682,13 +1682,18 @@ void thread_up(void) {
 
             /* Get mote information from current packet (addr, fcnt) */
             /* FHDR - DevAddr */
-            mote_addr  = p->payload[1];
-            mote_addr |= p->payload[2] << 8;
-            mote_addr |= p->payload[3] << 16;
-            mote_addr |= p->payload[4] << 24;
-            /* FHDR - FCnt */
-            mote_fcnt  = p->payload[6];
-            mote_fcnt |= p->payload[7] << 8;
+            if (p->size >= 8) {
+                mote_addr  = p->payload[1];
+                mote_addr |= p->payload[2] << 8;
+                mote_addr |= p->payload[3] << 16;
+                mote_addr |= p->payload[4] << 24;
+                /* FHDR - FCnt */
+                mote_fcnt  = p->payload[6];
+                mote_fcnt |= p->payload[7] << 8;
+            } else {
+                mote_addr = 0;
+                mote_fcnt = 0;
+            }
 
             /* basic packet filtering */
             pthread_mutex_lock(&mx_meas_up);
@@ -1696,7 +1701,6 @@ void thread_up(void) {
             switch(p->status) {
                 case STAT_CRC_OK:
                     meas_nb_rx_ok += 1;
-                    MSG("\nINFO: Received pkt from mote: %08X (fcnt=%u)\n", mote_addr, mote_fcnt);
                     if (!fwd_valid_pkt) {
                         pthread_mutex_unlock(&mx_meas_up);
                         continue; /* skip that packet */
@@ -1725,6 +1729,7 @@ void thread_up(void) {
             meas_up_pkt_fwd += 1;
             meas_up_payload_byte += p->size;
             pthread_mutex_unlock(&mx_meas_up);
+            MSG("\nINFO: Received pkt from mote: %08X (fcnt=%u)\n", mote_addr, mote_fcnt);
 
             /* Start of packet, add inter-packet separator if necessary */
             if (pkt_in_dgram == 0) {
@@ -1799,7 +1804,7 @@ void thread_up(void) {
                     buff_index += 9;
                     break;
                 default:
-                    MSG("ERROR: [up] received packet with unknown status\n");
+                    MSG("ERROR: [up] received packet with unknown status 0x%02X\n", p->status);
                     memcpy((void *)(buff_up + buff_index), (void *)",\"stat\":?", 9);
                     buff_index += 9;
                     exit(EXIT_FAILURE);
@@ -1837,7 +1842,7 @@ void thread_up(void) {
                         buff_index += 13;
                         break;
                     default:
-                        MSG("ERROR: [up] lora packet with unknown datarate\n");
+                        MSG("ERROR: [up] lora packet with unknown datarate 0x%02X\n", p->datarate);
                         memcpy((void *)(buff_up + buff_index), (void *)",\"datr\":\"SF?", 12);
                         buff_index += 12;
                         exit(EXIT_FAILURE);
@@ -1856,7 +1861,7 @@ void thread_up(void) {
                         buff_index += 6;
                         break;
                     default:
-                        MSG("ERROR: [up] lora packet with unknown bandwidth\n");
+                        MSG("ERROR: [up] lora packet with unknown bandwidth 0x%02X\n", p->bandwidth);
                         memcpy((void *)(buff_up + buff_index), (void *)"BW?\"", 4);
                         buff_index += 4;
                         exit(EXIT_FAILURE);
@@ -1885,7 +1890,7 @@ void thread_up(void) {
                         buff_index += 13;
                         break;
                     default:
-                        MSG("ERROR: [up] lora packet with unknown coderate\n");
+                        MSG("ERROR: [up] lora packet with unknown coderate 0x%02X\n", p->coderate);
                         memcpy((void *)(buff_up + buff_index), (void *)",\"codr\":\"?\"", 11);
                         buff_index += 11;
                         exit(EXIT_FAILURE);
@@ -1912,7 +1917,7 @@ void thread_up(void) {
                     exit(EXIT_FAILURE);
                 }
             } else {
-                MSG("ERROR: [up] received packet with unknown modulation\n");
+                MSG("ERROR: [up] received packet with unknown modulation 0x%02X\n", p->modulation);
                 exit(EXIT_FAILURE);
             }
 
@@ -2667,6 +2672,7 @@ void thread_down(void) {
                 pthread_mutex_lock(&mx_meas_dw);
                 meas_nb_tx_requested += 1;
                 pthread_mutex_unlock(&mx_meas_dw);
+                pthread_yield();
             }
 
             /* Send acknowledge datagram to server */

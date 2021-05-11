@@ -21,10 +21,12 @@ Maintainer: Michael Coracin
 #include <stdio.h>      /* printf fprintf */
 
 #include "loragw_sx125x.h"
+#if 0
 #include "loragw_sx1272_fsk.h"
 #include "loragw_sx1272_lora.h"
 #include "loragw_sx1276_fsk.h"
 #include "loragw_sx1276_lora.h"
+#endif
 #include "loragw_spi.h"
 #include "loragw_aux.h"
 #include "loragw_reg.h"
@@ -74,6 +76,7 @@ struct lgw_radio_type_version_s {
 
 #define PLL_LOCK_MAX_ATTEMPTS 5
 
+#if 0
 const struct lgw_sx127x_FSK_bandwidth_s sx127x_FskBandwidths[] =
 {
     { 2600  , 2, 7 },   /* LGW_SX127X_RXBW_2K6_HZ */
@@ -98,6 +101,7 @@ const struct lgw_sx127x_FSK_bandwidth_s sx127x_FskBandwidths[] =
     { 200000, 1, 1 },   /* ... */
     { 250000, 0, 1 }    /* LGW_SX127X_RXBW_250K_HZ */
 };
+#endif
 
 /* -------------------------------------------------------------------------- */
 /* --- PRIVATE VARIABLES ---------------------------------------------------- */
@@ -109,11 +113,12 @@ extern void *lgw_spi_target; /*! generic pointer to the SPI device */
 
 void sx125x_write(uint8_t channel, uint8_t addr, uint8_t data);
 uint8_t sx125x_read(uint8_t channel, uint8_t addr);
-
+#if 0
 int setup_sx1272_FSK(uint32_t frequency, enum lgw_sx127x_rxbw_e rxbw_khz, int8_t rssi_offset);
 int setup_sx1276_FSK(uint32_t frequency, enum lgw_sx127x_rxbw_e rxbw_khz, int8_t rssi_offset);
 
 int reset_sx127x(enum lgw_radio_type_e radio_type);
+#endif
 
 /* -------------------------------------------------------------------------- */
 /* --- PRIVATE FUNCTIONS DEFINITION ----------------------------------------- */
@@ -208,6 +213,7 @@ uint8_t sx125x_read(uint8_t channel, uint8_t addr) {
     return (uint8_t)read_value;
 }
 
+#if 0
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 int setup_sx1272_FSK(uint32_t frequency, enum lgw_sx127x_rxbw_e rxbw_khz, int8_t rssi_offset) {
@@ -389,7 +395,7 @@ int reset_sx127x(enum lgw_radio_type_e radio_type) {
 
     return LGW_REG_SUCCESS;
 }
-
+#endif
 /* -------------------------------------------------------------------------- */
 /* --- PUBLIC FUNCTIONS DEFINITION ------------------------------------------ */
 
@@ -476,6 +482,7 @@ int lgw_setup_sx125x(uint8_t rf_chain, uint8_t rf_clkout, bool rf_enable, uint8_
     return 0;
 }
 
+#if 0
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 int lgw_sx127x_reg_w(uint8_t address, uint8_t reg_value) {
@@ -558,5 +565,7 @@ int lgw_setup_sx127x(uint32_t frequency, uint8_t modulation, enum lgw_sx127x_rxb
 
     return LGW_REG_SUCCESS;
 }
+
+#endif
 
 /* --- EOF ------------------------------------------------------------------ */

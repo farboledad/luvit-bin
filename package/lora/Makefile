@@ -58,9 +58,7 @@ define Package/lora/install/test
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/lora_gateway/libloragw/test_loragw_gps $(1)/usr/bin/lora
 	# lora_gateway utils
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/lora_gateway/util_catch_pkt/util_catch_pkt $(1)/usr/bin/lora
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/lora_gateway/util_lbt_test/util_lbt_test $(1)/usr/bin/lora
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/lora_gateway/util_pkt_logger/util_pkt_logger $(1)/usr/bin/lora
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/lora_gateway/util_spectral_scan/util_spectral_scan $(1)/usr/bin/lora
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/lora_gateway/util_spi_stress/util_spi_stress $(1)/usr/bin/lora
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/lora_gateway/util_tx_continuous/util_tx_continuous $(1)/usr/bin/lora
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/lora_gateway/util_tx_test/util_tx_test $(1)/usr/bin/lora

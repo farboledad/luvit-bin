@@ -6,7 +6,7 @@ PKG_RELEASE:=1
 PKG_SOURCE_PROTO:=git
 
 PKG_SOURCE_URL:=git://github.com/luvitred/luv.git
-PKG_REV:=9ed0f9b1f300a68ff9e8da6e14f0cfbd9eba4082
+PKG_REV:=b32f23860325b15ac8b5b5a303d11f013b7aedf2
 PKG_BRANCH:=v$(PKG_VERSION)
 PKG_DATE:="2020-05-01"
 

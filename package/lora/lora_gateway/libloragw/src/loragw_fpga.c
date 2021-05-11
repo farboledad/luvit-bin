@@ -140,21 +140,21 @@ int lgw_fpga_configure(uint32_t tx_notch_freq) {
     }
 
     /* Get supported FPGA features */
-    DEBUG_PRINTF("INFO: FPGA supported features:");
+    DEBUG_MSG("INFO: FPGA supported features:");
     lgw_fpga_reg_r(LGW_FPGA_FEATURE, &val);
     tx_notch_support = TAKE_N_BITS_FROM((uint8_t)val, 0, 1);
     if (tx_notch_support == true) {
-        DEBUG_PRINTF(" [TX filter] ");
+        DEBUG_MSG(" [TX filter] ");
     }
     spectral_scan_support = TAKE_N_BITS_FROM((uint8_t)val, 1, 1);
     if (spectral_scan_support == true) {
-        DEBUG_PRINTF(" [Spectral Scan] ");
+        DEBUG_MSG(" [Spectral Scan] ");
     }
     lbt_support = TAKE_N_BITS_FROM((uint8_t)val, 2, 1);
     if (lbt_support == true) {
-        DEBUG_PRINTF(" [LBT] ");
+        DEBUG_MSG(" [LBT] ");
     }
-    DEBUG_PRINTF("\n");
+    DEBUG_MSG("\n");
 
     x  = lgw_fpga_reg_w(LGW_FPGA_CTRL_INPUT_SYNC_I, 1);
     x |= lgw_fpga_reg_w(LGW_FPGA_CTRL_INPUT_SYNC_Q, 1);

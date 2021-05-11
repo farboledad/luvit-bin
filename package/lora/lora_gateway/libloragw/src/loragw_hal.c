@@ -28,7 +28,9 @@ Maintainer: Sylvain Miermont
 #include "loragw_aux.h"
 #include "loragw_spi.h"
 #include "loragw_radio.h"
+#if 0
 #include "loragw_fpga.h"
+#endif
 #if LBT_ENABLED
 #include "loragw_lbt.h"
 #endif
@@ -391,9 +393,13 @@ uint16_t lgw_get_tx_start_delay(bool tx_notch_enable, uint8_t bw) {
     float tx_start_delay;
 
     /* Notch filtering performed by FPGA adds a constant delay (group delay) that we need to compensate */
+    #if 0
     if (tx_notch_enable) {
         notch_delay_us = lgw_fpga_get_tx_notch_delay();
     }
+    #else
+    (void) tx_notch_enable;
+    #endif
 
     /* Calibrated delay brought by SX1301 depending on signal bandwidth */
     switch (bw) {
@@ -489,10 +495,12 @@ int lgw_rxrf_setconf(uint8_t rf_chain, struct lgw_conf_rxrf_s conf) {
     }
 
     /* check if TX notch filter frequency is supported */
+    #if 0
     if ((conf.tx_enable == true) && ((conf.tx_notch_freq < LGW_MIN_NOTCH_FREQ) || (conf.tx_notch_freq > LGW_MAX_NOTCH_FREQ))) {
         DEBUG_PRINTF("WARNING: NOT A VALID TX NOTCH FILTER FREQUENCY [%u..%u]Hz\n", LGW_MIN_NOTCH_FREQ, LGW_MAX_NOTCH_FREQ);
         conf.tx_notch_freq = 0;
     }
+    #endif
 
     /* set internal config according to parameters */
     rf_enable[rf_chain] = conf.enable;

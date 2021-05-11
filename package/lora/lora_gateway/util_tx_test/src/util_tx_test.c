@@ -511,6 +511,7 @@ int main(int argc, char **argv)
     lgw_board_setconf(boardconf);
 
     /* LBT config */
+    #if 0
     if (lbt_enable) {
         memset(&lbtconf, 0, sizeof(lbtconf));
         lbtconf.enable = true;
@@ -525,6 +526,7 @@ int main(int argc, char **argv)
         }
         lgw_lbt_setconf(lbtconf);
     }
+    #endif
 
     /* RF config */
     memset(&rfconf, 0, sizeof(rfconf));
