@@ -304,7 +304,7 @@ int main(int argc, char **argv)
 
 	fp = fopen(argv[1], "r");
 	if (fp == NULL) {
-		fprintf(stderr, "unable to open file\n");
+		fprintf(stderr, "unable to open file %s\n", strerror(errno));
 		goto out;
 	}
 
@@ -312,7 +312,7 @@ int main(int argc, char **argv)
 
 	// Go to the end of the file.
 	if (fseek(fp, 0L, SEEK_END) != 0) {
-		fprintf(stderr, "fseek SEEK_END error\n");
+		fprintf(stderr, "fseek SEEK_END error %s\n", strerror(errno));
 		goto out;
 	}
 

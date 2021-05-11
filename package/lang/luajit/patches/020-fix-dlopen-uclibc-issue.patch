@@ -1,7 +1,5 @@
-Index: LuaJIT-2.1/src/lib_package.c
-===================================================================
---- LuaJIT-2.1.orig/src/lib_package.c
-+++ LuaJIT-2.1/src/lib_package.c
+--- a/src/lib_package.c
++++ b/src/lib_package.c
 @@ -243,7 +243,7 @@ static int ll_loadfunc(lua_State *L, con
      return PACKAGE_ERR_LIB;
    }
