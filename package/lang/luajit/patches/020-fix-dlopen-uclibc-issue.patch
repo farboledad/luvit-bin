@@ -1,0 +1,13 @@
+Index: LuaJIT-2.1/src/lib_package.c
+===================================================================
+--- LuaJIT-2.1.orig/src/lib_package.c
++++ LuaJIT-2.1/src/lib_package.c
+@@ -243,7 +243,7 @@ static int ll_loadfunc(lua_State *L, con
+     return PACKAGE_ERR_LIB;
+   }
+   reg = ll_register(L, path);
+-  if (*reg == NULL) *reg = ll_load(L, path, (*name == '*'));
++  if (*reg == NULL) *reg = ll_load(L, path, (*name == '*' || 1));
+   if (*reg == NULL) {
+     return PACKAGE_ERR_LIB;  /* Unable to load library. */
+   } else if (*name == '*') {  /* Only load library into global namespace. */

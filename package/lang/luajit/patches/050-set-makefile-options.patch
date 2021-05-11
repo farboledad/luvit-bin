@@ -1,0 +1,22 @@
+Index: LuaJIT-2.1/src/Makefile
+===================================================================
+--- LuaJIT-2.1.orig/src/Makefile
++++ LuaJIT-2.1/src/Makefile
+@@ -99,7 +99,7 @@ XCFLAGS=
+ # enabled by default. Some other features that *might* break some existing
+ # code (e.g. __pairs or os.execute() return values) can be enabled here.
+ # Note: this does not provide full compatibility with Lua 5.2 at this time.
+-#XCFLAGS+= -DLUAJIT_ENABLE_LUA52COMPAT
++XCFLAGS+= -DLUAJIT_ENABLE_LUA52COMPAT
+ #
+ # Disable the JIT compiler, i.e. turn LuaJIT into a pure interpreter.
+ #XCFLAGS+= -DLUAJIT_DISABLE_JIT
+@@ -196,7 +196,7 @@ HOST_CC= $(CC)
+ HOST_RM?= rm -f
+ # If left blank, minilua is built and used. You can supply an installed
+ # copy of (plain) Lua 5.1 or 5.2, plus Lua BitOp. E.g. with: HOST_LUA=lua
+-HOST_LUA=
++HOST_LUA=$(STAGING_DIR_HOST)/bin/luajit
+ 
+ HOST_XCFLAGS= -I.
+ HOST_XLDFLAGS=

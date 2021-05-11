@@ -1,0 +1,130 @@
+Index: libuv-1.9.0/include/uv.h
+===================================================================
+--- libuv-1.9.0.orig/include/uv.h	2016-04-28 15:44:44.000000000 +0200
++++ libuv-1.9.0/include/uv.h	2016-04-28 17:28:46.313795137 +0200
+@@ -716,7 +716,8 @@
+ enum uv_poll_event {
+   UV_READABLE = 1,
+   UV_WRITABLE = 2,
+-  UV_DISCONNECT = 4
++  UV_DISCONNECT = 4,
++  UV_INTERRUPT = 8
+ };
+ 
+ UV_EXTERN int uv_poll_init(uv_loop_t* loop, uv_poll_t* handle, int fd);
+Index: libuv-1.9.0/src/unix/core.c
+===================================================================
+--- libuv-1.9.0.orig/src/unix/core.c	2016-04-28 15:44:44.000000000 +0200
++++ libuv-1.9.0/src/unix/core.c	2016-04-28 17:39:15.043497483 +0200
+@@ -833,7 +833,7 @@
+ 
+ 
+ void uv__io_start(uv_loop_t* loop, uv__io_t* w, unsigned int events) {
+-  assert(0 == (events & ~(UV__POLLIN | UV__POLLOUT | UV__POLLRDHUP)));
++  assert(0 == (events & ~(UV__POLLIN | UV__POLLOUT | UV__POLLRDHUP | UV__POLLPRI)));
+   assert(0 != events);
+   assert(w->fd >= 0);
+   assert(w->fd < INT_MAX);
+@@ -866,7 +866,7 @@
+ 
+ 
+ void uv__io_stop(uv_loop_t* loop, uv__io_t* w, unsigned int events) {
+-  assert(0 == (events & ~(UV__POLLIN | UV__POLLOUT | UV__POLLRDHUP)));
++  assert(0 == (events & ~(UV__POLLIN | UV__POLLOUT | UV__POLLRDHUP | UV__POLLPRI)));
+   assert(0 != events);
+ 
+   if (w->fd == -1)
+@@ -898,7 +898,7 @@
+ 
+ 
+ void uv__io_close(uv_loop_t* loop, uv__io_t* w) {
+-  uv__io_stop(loop, w, UV__POLLIN | UV__POLLOUT | UV__POLLRDHUP);
++  uv__io_stop(loop, w, UV__POLLIN | UV__POLLOUT | UV__POLLRDHUP| UV__POLLPRI);
+   QUEUE_REMOVE(&w->pending_queue);
+ 
+   /* Remove stale events for this file descriptor */
+@@ -913,7 +913,7 @@
+ 
+ 
+ int uv__io_active(const uv__io_t* w, unsigned int events) {
+-  assert(0 == (events & ~(UV__POLLIN | UV__POLLOUT | UV__POLLRDHUP)));
++  assert(0 == (events & ~(UV__POLLIN | UV__POLLOUT | UV__POLLRDHUP | UV__POLLPRI)));
+   assert(0 != events);
+   return 0 != (w->pevents & events);
+ }
+Index: libuv-1.9.0/src/unix/internal.h
+===================================================================
+--- libuv-1.9.0.orig/src/unix/internal.h	2016-04-28 15:44:44.000000000 +0200
++++ libuv-1.9.0/src/unix/internal.h	2016-04-28 17:42:02.559488681 +0200
+@@ -91,6 +91,7 @@
+ 
+ #if defined(__linux__)
+ # define UV__POLLIN     UV__EPOLLIN
++# define UV__POLLPRI    UV__EPOLLPRI
+ # define UV__POLLOUT    UV__EPOLLOUT
+ # define UV__POLLERR    UV__EPOLLERR
+ # define UV__POLLHUP    UV__EPOLLHUP
+Index: libuv-1.9.0/src/unix/linux-core.c
+===================================================================
+--- libuv-1.9.0.orig/src/unix/linux-core.c	2016-04-28 15:44:44.000000000 +0200
++++ libuv-1.9.0/src/unix/linux-core.c	2016-04-28 17:45:16.447478494 +0200
+@@ -364,6 +364,10 @@
+       if (pe->events != 0) {
+         w->cb(loop, w, pe->events);
+         nevents++;
++       /* XXX dirty fix for GPIO analog adc driver bug. Only one interrupt is
++        * passed on. Succeeding interrupts are not noticed by epoll. */
++        uv__epoll_ctl(loop->backend_fd, UV__EPOLL_CTL_DEL, fd, pe);
++        uv__epoll_ctl(loop->backend_fd, UV__EPOLL_CTL_ADD, fd, pe);
+       }
+     }
+     loop->watchers[loop->nwatchers] = NULL;
+Index: libuv-1.9.0/src/unix/poll.c
+===================================================================
+--- libuv-1.9.0.orig/src/unix/poll.c	2016-04-28 15:44:44.000000000 +0200
++++ libuv-1.9.0/src/unix/poll.c	2016-04-28 17:51:35.483458578 +0200
+@@ -33,7 +33,7 @@
+ 
+   handle = container_of(w, uv_poll_t, io_watcher);
+ 
+-  if (events & UV__POLLERR) {
++  if (!(events & UV__POLLPRI) && (events & UV__POLLERR)) {
+     uv__io_stop(loop, w, UV__POLLIN | UV__POLLOUT | UV__POLLRDHUP);
+     uv__handle_stop(handle);
+     handle->poll_cb(handle, -EBADF, 0);
+@@ -47,6 +47,8 @@
+     pevents |= UV_WRITABLE;
+   if (events & UV__POLLRDHUP)
+     pevents |= UV_DISCONNECT;
++  if (events & UV__POLLPRI)
++    pevents |= UV_INTERRUPT;
+ 
+   handle->poll_cb(handle, 0, pevents);
+ }
+@@ -79,7 +81,7 @@
+ static void uv__poll_stop(uv_poll_t* handle) {
+   uv__io_stop(handle->loop,
+               &handle->io_watcher,
+-              UV__POLLIN | UV__POLLOUT | UV__POLLRDHUP);
++              UV__POLLIN | UV__POLLOUT | UV__POLLRDHUP | UV__POLLPRI);
+   uv__handle_stop(handle);
+ }
+ 
+@@ -94,7 +96,7 @@
+ int uv_poll_start(uv_poll_t* handle, int pevents, uv_poll_cb poll_cb) {
+   int events;
+ 
+-  assert((pevents & ~(UV_READABLE | UV_WRITABLE | UV_DISCONNECT)) == 0);
++  assert((pevents & ~(UV_READABLE | UV_WRITABLE | UV_DISCONNECT | UV_INTERRUPT)) == 0);
+   assert(!(handle->flags & (UV_CLOSING | UV_CLOSED)));
+ 
+   uv__poll_stop(handle);
+@@ -109,6 +111,8 @@
+     events |= UV__POLLOUT;
+   if (pevents & UV_DISCONNECT)
+     events |= UV__POLLRDHUP;
++  if (pevents & UV_INTERRUPT)
++    events |= UV__POLLPRI;
+ 
+   uv__io_start(handle->loop, &handle->io_watcher, events);
+   uv__handle_start(handle);
