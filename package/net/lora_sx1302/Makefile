@@ -49,6 +49,13 @@ define Build/Compile
 	$(MAKE) all -C $(PKG_BUILD_DIR)/packet_forwarder $(OPTS)
 endef
 
+define Build/InstallDev
+	$(INSTALL_DIR) $(1)/usr/include/libloragw
+	$(CP) $(PKG_BUILD_DIR)/libloragw/inc/*.h $(1)/usr/include/libloragw/
+	$(INSTALL_DIR) $(1)/usr/lib
+	$(CP) $(PKG_BUILD_DIR)/libloragw/libloragw.a $(1)/usr/lib/
+endef
+
 define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/usr/bin/lora
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/packet_forwarder/lora_pkt_fwd $(1)/usr/bin/lora/lora_pkt_fwd_sx1302

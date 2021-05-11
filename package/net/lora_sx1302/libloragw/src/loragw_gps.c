@@ -551,7 +551,8 @@ enum gps_msg lgw_parse_nmea(const char *serial_buff, int buff_size) {
         j = sscanf(parser_buf + str_index[9], "%2hd%2hd%2hd", &gps_day, &gps_mon, &gps_yea);
         if ((i == 4) && (j == 3)) {
             if ((gps_mod == 'A') || (gps_mod == 'D')) {
-                gps_time_ok = true;
+                /* gps rollover test */
+                gps_time_ok = (gps_yea >= 21);
                 DEBUG_MSG("Note: Valid RMC sentence, GPS locked, date: 20%02d-%02d-%02dT%02d:%02d:%06.3fZ\n", gps_yea, gps_mon, gps_day, gps_hou, gps_min, gps_fra + (float)gps_sec);
             } else {
                 gps_time_ok = false;

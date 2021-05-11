@@ -11,6 +11,7 @@ CC := $(CROSS_COMPILE)gcc
 AR := $(CROSS_COMPILE)ar
 
 CFLAGS := -O2 -Wall -Wextra -std=c99 -Iinc -I. -I../libtools/inc
+override CFLAGS += -DNODEBUG
 
 OBJDIR = obj
 INCLUDES = $(wildcard inc/*.h) $(wildcard ../libtools/inc/*.h)
