@@ -1,4 +1,0 @@
-030-pollpri-mods.patch
-031-pollpri-mods.patch
-040-switch-to-clock-realtime-for-condwait.patch
-050-return-udp-dst-address.patch

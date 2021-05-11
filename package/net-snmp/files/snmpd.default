@@ -1,2 +1,0 @@
-#OPTIONS="-Ls 16: -C -c /var/run/snmpd.conf -Dverbose:cloudGatePrivate -p /var/run/snmpd.pid"
-OPTIONS="-Ls 16: -C -c /var/run/snmpd.conf -p /var/run/snmpd.pid"

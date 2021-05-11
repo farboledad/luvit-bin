@@ -150,8 +150,8 @@ char *cg_conf_get_default(cg_config_t *ctx, const char *section, const char *opt
 
     if (cg_conf_get(ctx, section, option, &tmp) != CG_STATUS_OK) {
         tmp = default_val;
-        if (cg_conf_set(ctx, section, option, tmp) != CG_STATUS_OK) {
-            LOGE("Error setting default option\n");
+        if (default_val && default_val[0] && cg_conf_set(ctx, section, option, tmp) != CG_STATUS_OK) {
+            LOGE("Error setting default option %s\n", option);
         }
     }
     retval = (char *)malloc(strlen(tmp) + 1);
@@ -163,9 +163,11 @@ char *cg_conf_get_default(cg_config_t *ctx, const char *section, const char *opt
 char *cg_conf_set_default(cg_config_t *ctx, const char *section, const char *option, const char *default_val)
 {
     char *retval;
-
-    if (cg_conf_set(ctx, section, option, default_val) != CG_STATUS_OK) {
-        LOGE("Error setting default option\n");
+    if (!default_val || !default_val[0]) {
+        cg_conf_del(ctx, section, option);
+    }
+    else if (cg_conf_set(ctx, section, option, default_val) != CG_STATUS_OK) {
+        LOGE("Error setting default option %s\n", option);
     }
     retval = strdup(default_val);
     LOGD("Set value %s: %s\n", option, retval);

@@ -16,14 +16,13 @@ Each luvitred version has a minimum firmware version. It is best to match this m
 
 Extract the sdk:
 
-tar -xvjf CloudGate-SDK-x86_64-v2.91.2.tar.bz2
+tar -xvjf CloudGate-SDK-x86_64-v2.94.1.tar.bz2
 
 The location of the extracted SDK is further referenced as SDK_ROOT.
 
 Untar the luvit-bin.tar.gz file to your CloudGate SDK root directory:
 
 cd SDK_ROOT
-rm -rf package/dallas-sdk
 tar xvzf luvit-bin.tar.gz
 
 
