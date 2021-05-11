@@ -44,9 +44,8 @@ endef
 
 define Package/$(PKG_NAME)/install/bin
 	$(INSTALL_DIR) $(1)/usr/bin/lora
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/packet_forwarder/lora_pkt_fwd/lora_pkt_fwd $(1)/usr/bin/lora
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/packet_forwarder/lora_pkt_fwd/lora_pkt_fwd $(1)/usr/bin/lora/lora_pkt_fwd_sx1301
 	$(CP) $(PKG_BUILD_DIR)/packet_forwarder/lora_pkt_fwd/global_conf_*.json $(1)/usr/bin/lora
-	$(CP) $(PKG_BUILD_DIR)/packet_forwarder/lora_pkt_fwd/local_conf_*.json $(1)/usr/bin/lora
 endef
 
 define Package/$(PKG_NAME)/install/test
