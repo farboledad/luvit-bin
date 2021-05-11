@@ -46,7 +46,7 @@ currentTime OBJECT-TYPE
 	::= { systemInfo 2 }
 
 serialNumber OBJECT-TYPE
-	SYNTAX Integer32
+	SYNTAX DisplayString
 	ACCESS read-only
 	STATUS current
 	DESCRIPTION

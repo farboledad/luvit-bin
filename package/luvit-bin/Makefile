@@ -12,7 +12,7 @@ define Package/luvit-bin
   SECTION:= base
   CATEGORY:= Base system
   TITLE:= Luvit-red (binary)
-  DEPENDS:=+snmpconfig +libuv +luv +luvi +owire +luvit-red-config +leveldb +luajit +libexpat +pthsem +knxd +qpid-proton +lora +lora_sx1302 +ble_fw_loader +net-snmp
+  DEPENDS:=+snmpconfig +libuv +luv +luvi +owire +luvit-red-config +leveldb +luajit +libexpat +pthsem +knxd +qpid-proton +lora +lora_sx1302 +ble_fw_loader +net-snmp +vsftpd-tls
 endef
 
 define Build/Prepare

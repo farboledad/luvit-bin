@@ -1,0 +1,20 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2006-2011 OpenWrt.org
+
+START=50
+
+start() {
+
+        if [ ! -e /etc/vsftpd.conf ]
+        then
+                echo "vsftpd failed - probably invalid config."
+                exit 0
+        fi
+
+        mkdir -m 0755 -p /var/run/vsftpd
+        /rom/mnt/cust/usr/sbin/vsftpd
+}
+stop() {
+        killall vsftpd
+}
+
